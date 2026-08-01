@@ -4,11 +4,11 @@ import com.jobboard.jobboard.module.candidat.CandidatRepository;
 import com.jobboard.jobboard.module.entreprise.EntrepriseService;
 import com.jobboard.jobboard.module.offre.OffreService;
 import com.jobboard.jobboard.module.recruteur.RecruteurRepository;
-import com.jobboard.jobboard.shared.domain.StatutCompte;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import com.jobboard.jobboard.shared.domain.StatutCompte;
 
 @Controller
 @RequestMapping("/admin")

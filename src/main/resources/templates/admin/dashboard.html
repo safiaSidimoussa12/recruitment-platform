@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><title>Dashboard Admin</title></head>
+<body>
+<nav th:replace="~{layout/base :: nav}"></nav>
+<main class="container mt-4">
+    <h2>Dashboard Administrateur</h2>
+    <div class="row mt-4">
+        <div class="col-md-4">
+            <div class="card text-white bg-primary mb-3">
+                <div class="card-body text-center">
+                    <h3 th:text="${totalUtilisateurs}">0</h3>
+                    <p>Utilisateurs</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-success mb-3">
+                <div class="card-body text-center">
+                    <h3 th:text="${totalEntreprises}">0</h3>
+                    <p>Entreprises</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="mt-3">
+        <a th:href="@{/admin/utilisateurs}" class="btn btn-primary me-2">
+            Gérer les utilisateurs
+        </a>
+        <a th:href="@{/admin/entreprises}" class="btn btn-outline-primary">
+            Gérer les entreprises
+        </a>
+    </div>
+</main>
+</body>
+</html>

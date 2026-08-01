@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><title>Inscription</title></head>
+<body>
+<nav th:replace="~{layout/base :: nav}"></nav>
+<main class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body p-4">
+                    <h4 class="text-center mb-4">Créer un compte</h4>
+
+                    <div th:if="${erreur}" class="alert alert-danger" th:text="${erreur}"></div>
+
+                    <form th:action="@{/register/candidat}" method="post"
+                          th:object="${request}">
+                        <h6 class="text-muted mb-3">Informations personnelles</h6>
+                        <div class="row">
+                            <div class="col mb-3">
+                                <label class="form-label">Nom</label>
+                                <input type="text" th:field="*{nom}" class="form-control"/>
+                                <small class="text-danger"
+                                       th:errors="*{nom}"></small>
+                            </div>
+                            <div class="col mb-3">
+                                <label class="form-label">Prénom</label>
+                                <input type="text" th:field="*{prenom}" class="form-control"/>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" th:field="*{email}" class="form-control"/>
+                            <small class="text-danger" th:errors="*{email}"></small>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Mot de passe</label>
+                            <input type="password" th:field="*{motDePasse}" class="form-control"/>
+                            <small class="text-danger" th:errors="*{motDePasse}"></small>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                S'inscrire comme Candidat
+                            </button>
+                            <button type="submit"
+                                    formaction="/register/recruteur"
+                                    class="btn btn-outline-primary">
+                                S'inscrire comme Recruteur
+                            </button>
+                        </div>
+                    </form>
+                    <hr/>
+                    <p class="text-center mb-0">
+                        Déjà un compte ? <a th:href="@{/login}">Se connecter</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+</body>
+</html>

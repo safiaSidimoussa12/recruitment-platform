@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><title>Erreur</title></head>
+<body>
+<nav th:replace="~{layout/base :: nav}"></nav>
+<main class="container mt-5 text-center">
+    <h1 class="display-1 text-warning">400</h1>
+    <p class="lead" th:text="${erreur} ?: 'Requête invalide.'"></p>
+    <a th:href="@{/offres}" class="btn btn-primary">Retour à l'accueil</a>
+</main>
+</body>
+</html>

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><title>Mon profil</title></head>
+<body>
+<nav th:replace="~{layout/base :: nav}"></nav>
+<main class="container mt-4">
+    <h2>Mon profil</h2>
+    <div th:if="${param.success}" class="alert alert-success">Profil mis à jour.</div>
+    <div th:if="${param.cvSuccess}" class="alert alert-success">CV uploadé avec succès.</div>
+
+    <div class="row">
+        <div class="col-md-7">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Informations personnelles</h5>
+                    <form th:action="@{/candidat/profil}" method="post"
+                          th:object="${candidat}">
+                        <div class="row">
+                            <div class="col mb-3">
+                                <label class="form-label">Nom</label>
+                                <input type="text" th:field="*{nom}" class="form-control"/>
+                            </div>
+                            <div class="col mb-3">
+                                <label class="form-label">Prénom</label>
+                                <input type="text" th:field="*{prenom}" class="form-control"/>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Téléphone</label>
+                            <input type="text" th:field="*{telephone}" class="form-control"/>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Ville</label>
+                            <input type="text" th:field="*{ville}" class="form-control"/>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Enregistrer</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-5">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Mon CV</h5>
+                    <div th:if="${candidat.cv != null}" class="mb-3">
+                        <p class="text-success">✓ CV déposé</p>
+                        <small class="text-muted"
+                               th:text="${#temporals.format(candidat.cv.dateUpload,'dd/MM/yyyy')}">
+                        </small>
+                    </div>
+                    <div th:unless="${candidat.cv != null}" class="mb-3">
+                        <p class="text-warning">Aucun CV déposé.</p>
+                    </div>
+                    <form th:action="@{/candidat/cv}" method="post"
+                          enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <input type="file" name="file" accept=".pdf"
+                                   class="form-control"/>
+                        </div>
+                        <button type="submit" class="btn btn-outline-primary">
+                            Uploader le CV
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+</body>
+</html>

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><title>Mes candidatures</title></head>
+<body>
+<nav th:replace="~{layout/base :: nav}"></nav>
+<main class="container mt-4">
+    <h2>Mes candidatures</h2>
+    <div th:if="${param.success}" class="alert alert-success">
+        Candidature soumise avec succès.
+    </div>
+
+    <div th:if="${candidatures.isEmpty()}" class="alert alert-info">
+        Vous n'avez pas encore postulé à une offre.
+    </div>
+
+    <table class="table table-hover" th:unless="${candidatures.isEmpty()}">
+        <thead class="table-light">
+            <tr>
+                <th>Offre</th>
+                <th>Entreprise</th>
+                <th>Date</th>
+                <th>Statut</th>
+                <th>Messages</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="c : ${candidatures}">
+                <td th:text="${c.offre.titre}"></td>
+                <td th:text="${c.offre.entreprise.nom}"></td>
+                <td th:text="${#temporals.format(c.dateSoumission,'dd/MM/yyyy')}"></td>
+                <td>
+                    <span class="badge"
+                          th:classappend="${c.statut.name() == 'ACCEPTEE'} ? 'bg-success' :
+                                         (${c.statut.name() == 'REFUSEE'} ? 'bg-danger' : 'bg-warning text-dark')"
+                          th:text="${c.statut}"></span>
+                </td>
+                <td>
+                    <a th:href="@{/messages/{id}(id=${c.id})}"
+                       class="btn btn-sm btn-outline-primary">
+                        Messagerie
+                    </a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</main>
+</body>
+</html>

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><title>Offres d'emploi</title></head>
+<body>
+<nav th:replace="~{layout/base :: nav}"></nav>
+<main class="container mt-4">
+
+    <h2 class="mb-4">Offres d'emploi</h2>
+
+    <!-- Formulaire de recherche -->
+    <form th:action="@{/offres}" method="get" class="card p-3 mb-4 bg-light">
+        <div class="row g-2">
+            <div class="col-md-4">
+                <input type="text" name="keyword" class="form-control"
+                       placeholder="Mots-clés..." th:value="${keyword}"/>
+            </div>
+            <div class="col-md-2">
+                <input type="text" name="ville" class="form-control"
+                       placeholder="Ville" th:value="${ville}"/>
+            </div>
+            <div class="col-md-2">
+                <input type="text" name="domaine" class="form-control"
+                       placeholder="Domaine" th:value="${domaine}"/>
+            </div>
+            <div class="col-md-2">
+                <select name="typeContrat" class="form-select">
+                    <option value="">Contrat</option>
+                    <option th:each="t : ${typesContrat}"
+                            th:value="${t}" th:text="${t}"
+                            th:selected="${t == typeContrat}"></option>
+                </select>
+            </div>
+            <div class="col-md-1">
+                <input type="number" name="salaireMin" class="form-control"
+                       placeholder="Salaire min" th:value="${salaireMin}"/>
+            </div>
+            <div class="col-md-1">
+                <button type="submit" class="btn btn-primary w-100">
+                    Rechercher
+                </button>
+            </div>
+        </div>
+    </form>
+
+    <!-- Résultats -->
+    <div th:if="${offres.isEmpty()}" class="alert alert-info">
+        Aucune offre trouvée.
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-2 g-3">
+        <div class="col" th:each="offre : ${offres}">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title" th:text="${offre.titre}"></h5>
+                    <p class="text-muted mb-1"
+                       th:text="${offre.entreprise.nom}"></p>
+                    <span class="badge bg-secondary me-1"
+                          th:text="${offre.ville}"></span>
+                    <span class="badge bg-info text-dark"
+                          th:text="${offre.typeContrat}"></span>
+                    <p class="card-text mt-2 text-truncate"
+                       th:text="${offre.description}"></p>
+                </div>
+                <div class="card-footer d-flex justify-content-between">
+                    <small class="text-muted"
+                           th:text="${#temporals.format(offre.datePublication,'dd/MM/yyyy')}">
+                    </small>
+                    <a th:href="@{/offres/{id}(id=${offre.id})}"
+                       class="btn btn-sm btn-primary">Voir l'offre</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    <nav class="mt-4" th:if="${offres.totalPages > 1}">
+        <ul class="pagination justify-content-center">
+            <li class="page-item" th:classappend="${offres.first} ? 'disabled'">
+                <a class="page-link"
+                   th:href="@{/offres(page=${offres.number - 1}, keyword=${keyword})}">
+                    Précédent
+                </a>
+            </li>
+            <li class="page-item" th:each="i : ${#numbers.sequence(0, offres.totalPages - 1)}"
+                th:classappend="${i == offres.number} ? 'active'">
+                <a class="page-link"
+                   th:href="@{/offres(page=${i}, keyword=${keyword})}"
+                   th:text="${i + 1}"></a>
+            </li>
+            <li class="page-item" th:classappend="${offres.last} ? 'disabled'">
+                <a class="page-link"
+                   th:href="@{/offres(page=${offres.number + 1}, keyword=${keyword})}">
+                    Suivant
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+</main>
+</body>
+</html>

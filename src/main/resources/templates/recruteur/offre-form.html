@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><title>Publier une offre</title></head>
+<body>
+<nav th:replace="~{layout/base :: nav}"></nav>
+<main class="container mt-4">
+    <h2 th:text="${offre.id != null} ? 'Modifier l\'offre' : 'Publier une offre'"></h2>
+
+    <div class="card">
+        <div class="card-body">
+            <form th:action="${offre.id != null} ? @{/recruteur/offres/{id}(id=${offre.id})} : @{/recruteur/offres}"
+                  method="post" th:object="${offre}">
+                <div class="mb-3">
+                    <label class="form-label">Titre *</label>
+                    <input type="text" th:field="*{titre}" class="form-control" required/>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Description *</label>
+                    <textarea th:field="*{description}" class="form-control" rows="5" required></textarea>
+                </div>
+                <div class="row">
+                    <div class="col mb-3">
+                        <label class="form-label">Ville</label>
+                        <input type="text" th:field="*{ville}" class="form-control"/>
+                    </div>
+                    <div class="col mb-3">
+                        <label class="form-label">Domaine</label>
+                        <input type="text" th:field="*{domaine}" class="form-control"/>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col mb-3">
+                        <label class="form-label">Salaire min</label>
+                        <input type="number" th:field="*{salaireMin}" class="form-control"/>
+                    </div>
+                    <div class="col mb-3">
+                        <label class="form-label">Salaire max</label>
+                        <input type="number" th:field="*{salaireMax}" class="form-control"/>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col mb-3">
+                        <label class="form-label">Type de contrat *</label>
+                        <select th:field="*{typeContrat}" class="form-select" required>
+                            <option value="">-- Choisir --</option>
+                            <option th:each="t : ${typesContrat}"
+                                    th:value="${t}" th:text="${t}"></option>
+                        </select>
+                    </div>
+                    <div class="col mb-3">
+                        <label class="form-label">Date de clôture</label>
+                        <input type="date" th:field="*{dateCloture}" class="form-control"/>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <span th:text="${offre.id != null} ? 'Modifier' : 'Publier'"></span>
+                </button>
+                <a th:href="@{/recruteur/offres}" class="btn btn-secondary ms-2">Annuler</a>
+            </form>
+        </div>
+    </div>
+</main>
+</body>
+</html>
