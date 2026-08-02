@@ -52,7 +52,7 @@
 
                 <div class="p-4 border-top" style="background:#f8fafc">
                     <form th:action="@{/messages/{id}(id=${candidatureId})}" method="post">
-                        <input type="hidden" name="destinataireId" value="0"/>
+                       <input type="hidden" name="destinataireId" th:value="${destinataireId}"/>
                         <div class="d-flex gap-3">
                             <textarea name="contenu" class="form-control form-control-modern"
                                       rows="2" placeholder="Type your message..." required
