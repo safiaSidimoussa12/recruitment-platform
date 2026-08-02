@@ -1,64 +1,100 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head><title>Publier une offre</title></head>
+<head th:replace="~{layout/base :: head('Post a Job')}"></head>
 <body>
-<nav th:replace="~{layout/base :: nav}"></nav>
-<main class="container mt-4">
-    <h2 th:text="${offre.id != null} ? 'Modifier l\'offre' : 'Publier une offre'"></h2>
+<nav th:replace="~{layout/base :: navbar}"></nav>
 
-    <div class="card">
-        <div class="card-body">
-            <form th:action="${offre.id != null} ? @{/recruteur/offres/{id}(id=${offre.id})} : @{/recruteur/offres}"
-                  method="post" th:object="${offre}">
-                <div class="mb-3">
-                    <label class="form-label">Titre *</label>
-                    <input type="text" th:field="*{titre}" class="form-control" required/>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Description *</label>
-                    <textarea th:field="*{description}" class="form-control" rows="5" required></textarea>
-                </div>
-                <div class="row">
-                    <div class="col mb-3">
-                        <label class="form-label">Ville</label>
-                        <input type="text" th:field="*{ville}" class="form-control"/>
+<div class="page-header">
+    <div class="container">
+        <h1 th:text="${offre.id != null} ? 'Edit Job Listing' : 'Post a New Job'"></h1>
+        <p class="text-muted mb-0">Fill in the details to attract the best candidates</p>
+    </div>
+</div>
+
+<div class="container mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card-modern card p-4">
+                <form th:action="${offre.id != null} ?
+                                  @{/recruteur/offres/{id}(id=${offre.id})} :
+                                  @{/recruteur/offres}"
+                      method="post" th:object="${offre}">
+                    <div class="mb-3">
+                        <label class="form-label text-muted small fw-600">JOB TITLE *</label>
+                        <input type="text" th:field="*{titre}"
+                               class="form-control form-control-modern"
+                               placeholder="e.g. Senior Java Developer" required/>
                     </div>
-                    <div class="col mb-3">
-                        <label class="form-label">Domaine</label>
-                        <input type="text" th:field="*{domaine}" class="form-control"/>
+                    <div class="mb-3">
+                        <label class="form-label text-muted small fw-600">DESCRIPTION *</label>
+                        <textarea th:field="*{description}"
+                                  class="form-control form-control-modern"
+                                  rows="6"
+                                  placeholder="Describe the role, responsibilities, requirements..."
+                                  required></textarea>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col mb-3">
-                        <label class="form-label">Salaire min</label>
-                        <input type="number" th:field="*{salaireMin}" class="form-control"/>
+                    <div class="row">
+                        <div class="col mb-3">
+                            <label class="form-label text-muted small fw-600">CITY</label>
+                            <input type="text" th:field="*{ville}"
+                                   class="form-control form-control-modern"
+                                   placeholder="Algiers"/>
+                        </div>
+                        <div class="col mb-3">
+                            <label class="form-label text-muted small fw-600">DOMAIN</label>
+                            <input type="text" th:field="*{domaine}"
+                                   class="form-control form-control-modern"
+                                   placeholder="IT, Finance..."/>
+                        </div>
                     </div>
-                    <div class="col mb-3">
-                        <label class="form-label">Salaire max</label>
-                        <input type="number" th:field="*{salaireMax}" class="form-control"/>
+                    <div class="row">
+                        <div class="col mb-3">
+                            <label class="form-label text-muted small fw-600">MIN SALARY (DA)</label>
+                            <input type="number" th:field="*{salaireMin}"
+                                   class="form-control form-control-modern"
+                                   placeholder="60000"/>
+                        </div>
+                        <div class="col mb-3">
+                            <label class="form-label text-muted small fw-600">MAX SALARY (DA)</label>
+                            <input type="number" th:field="*{salaireMax}"
+                                   class="form-control form-control-modern"
+                                   placeholder="100000"/>
+                        </div>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col mb-3">
-                        <label class="form-label">Type de contrat *</label>
-                        <select th:field="*{typeContrat}" class="form-select" required>
-                            <option value="">-- Choisir --</option>
-                            <option th:each="t : ${typesContrat}"
-                                    th:value="${t}" th:text="${t}"></option>
-                        </select>
+                    <div class="row">
+                        <div class="col mb-4">
+                            <label class="form-label text-muted small fw-600">CONTRACT TYPE *</label>
+                            <select th:field="*{typeContrat}"
+                                    class="form-select form-select-modern" required>
+                                <option value="">-- Select --</option>
+                                <option th:each="t : ${typesContrat}"
+                                        th:value="${t}" th:text="${t}"></option>
+                            </select>
+                        </div>
+                        <div class="col mb-4">
+                            <label class="form-label text-muted small fw-600">CLOSING DATE</label>
+                            <input type="date" th:field="*{dateCloture}"
+                                   class="form-control form-control-modern"/>
+                        </div>
                     </div>
-                    <div class="col mb-3">
-                        <label class="form-label">Date de clôture</label>
-                        <input type="date" th:field="*{dateCloture}" class="form-control"/>
+                    <div class="d-flex gap-3">
+                        <button type="submit" class="btn-primary-custom">
+                            <i class="bi bi-send me-2"></i>
+                            <span th:text="${offre.id != null} ? 'Update Job' : 'Publish Job'"></span>
+                        </button>
+                        <a th:href="@{/recruteur/offres}" class="btn-outline-custom">
+                            Cancel
+                        </a>
                     </div>
-                </div>
-                <button type="submit" class="btn btn-primary">
-                    <span th:text="${offre.id != null} ? 'Modifier' : 'Publier'"></span>
-                </button>
-                <a th:href="@{/recruteur/offres}" class="btn btn-secondary ms-2">Annuler</a>
-            </form>
+                </form>
+            </div>
         </div>
     </div>
-</main>
+</div>
+
+<footer class="footer-custom">
+    <div class="container"><p class="mb-0">© 2026 JobBoard</p></div>
+</footer>
+<th:block th:replace="~{layout/base :: scripts}"></th:block>
 </body>
 </html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/base :: head('Manage Users')}"></head>
+<body>
+<nav th:replace="~{layout/base :: navbar}"></nav>
+
+<div class="page-header">
+    <div class="container d-flex justify-content-between align-items-center">
+        <div>
+            <h1>Manage Users</h1>
+            <p class="text-muted mb-0">Activate or suspend user accounts</p>
+        </div>
+        <a th:href="@{/admin/dashboard}" class="btn-outline-custom">
+            ← Dashboard
+        </a>
+    </div>
+</div>
+
+<div class="container mb-5">
+    <div class="card-modern card">
+        <div class="card-body p-0">
+            <table class="table table-modern mb-0">
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="u : ${utilisateurs}">
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="rounded-circle d-flex align-items-center justify-content-center"
+                                     style="width:36px;height:36px;background:var(--gradient);color:white;font-weight:700;font-size:0.8rem"
+                                     th:text="${#strings.substring(u.email,0,1).toUpperCase()}">
+                                </div>
+                                <span class="fw-500" th:text="${u.email}"></span>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge-contract" th:text="${u.role}"></span>
+                        </td>
+                        <td>
+                            <span th:if="${u.statut.name() == 'ACTIF'}"
+                                  class="badge-status-accepted">Active</span>
+                            <span th:unless="${u.statut.name() == 'ACTIF'}"
+                                  class="badge-status-refused">Suspended</span>
+                        </td>
+                        <td>
+                            <form th:action="@{/admin/utilisateurs/{id}/suspendre(id=${u.id})}"
+                                  method="post" class="d-inline"
+                                  th:if="${u.statut.name() == 'ACTIF'}">
+                                <button type="submit"
+                                        class="btn btn-sm border"
+                                        style="border-radius:8px;color:#d97706;border-color:#fde68a">
+                                    <i class="bi bi-pause-circle me-1"></i>Suspend
+                                </button>
+                            </form>
+                            <form th:action="@{/admin/utilisateurs/{id}/activer(id=${u.id})}"
+                                  method="post" class="d-inline"
+                                  th:unless="${u.statut.name() == 'ACTIF'}">
+                                <button type="submit"
+                                        class="btn btn-sm border"
+                                        style="border-radius:8px;color:#16a34a;border-color:#bbf7d0">
+                                    <i class="bi bi-play-circle me-1"></i>Activate
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<footer class="footer-custom">
+    <div class="container"><p class="mb-0">© 2026 JobBoard</p></div>
+</footer>
+<th:block th:replace="~{layout/base :: scripts}"></th:block>
+</body>
+</html>

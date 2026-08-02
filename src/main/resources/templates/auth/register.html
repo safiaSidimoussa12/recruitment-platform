@@ -1,61 +1,81 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head><title>Inscription</title></head>
+<head th:replace="~{layout/base :: head('Register')}"></head>
 <body>
-<nav th:replace="~{layout/base :: nav}"></nav>
-<main class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card shadow-sm">
-                <div class="card-body p-4">
-                    <h4 class="text-center mb-4">Créer un compte</h4>
+<nav th:replace="~{layout/base :: navbar}"></nav>
 
-                    <div th:if="${erreur}" class="alert alert-danger" th:text="${erreur}"></div>
+<div class="auth-wrapper">
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="auth-card card">
+                    <div class="auth-header">
+                        <i class="bi bi-person-plus-fill fs-1 mb-3 d-block"></i>
+                        <h3 class="fw-bold mb-1">Create your account</h3>
+                        <p class="opacity-75 mb-0">Join thousands of professionals</p>
+                    </div>
+                    <div class="card-body p-4">
+                        <div th:if="${erreur}" class="alert border-0 rounded-3 mb-4"
+                             style="background:#fef2f2; color:#dc2626;"
+                             th:text="${erreur}"></div>
 
-                    <form th:action="@{/register/candidat}" method="post"
-                          th:object="${request}">
-                        <h6 class="text-muted mb-3">Informations personnelles</h6>
-                        <div class="row">
-                            <div class="col mb-3">
-                                <label class="form-label">Nom</label>
-                                <input type="text" th:field="*{nom}" class="form-control"/>
-                                <small class="text-danger"
-                                       th:errors="*{nom}"></small>
+                        <form th:action="@{/register/candidat}" method="post"
+                              th:object="${request}">
+                            <div class="row">
+                                <div class="col mb-3">
+                                    <label class="form-label fw-600 text-muted small">FIRST NAME</label>
+                                    <input type="text" th:field="*{prenom}"
+                                           class="form-control form-control-modern"
+                                           placeholder="Sara"/>
+                                    <small class="text-danger" th:errors="*{prenom}"></small>
+                                </div>
+                                <div class="col mb-3">
+                                    <label class="form-label fw-600 text-muted small">LAST NAME</label>
+                                    <input type="text" th:field="*{nom}"
+                                           class="form-control form-control-modern"
+                                           placeholder="Benali"/>
+                                    <small class="text-danger" th:errors="*{nom}"></small>
+                                </div>
                             </div>
-                            <div class="col mb-3">
-                                <label class="form-label">Prénom</label>
-                                <input type="text" th:field="*{prenom}" class="form-control"/>
+                            <div class="mb-3">
+                                <label class="form-label fw-600 text-muted small">EMAIL</label>
+                                <input type="email" th:field="*{email}"
+                                       class="form-control form-control-modern"
+                                       placeholder="you@example.com"/>
+                                <small class="text-danger" th:errors="*{email}"></small>
                             </div>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Email</label>
-                            <input type="email" th:field="*{email}" class="form-control"/>
-                            <small class="text-danger" th:errors="*{email}"></small>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Mot de passe</label>
-                            <input type="password" th:field="*{motDePasse}" class="form-control"/>
-                            <small class="text-danger" th:errors="*{motDePasse}"></small>
-                        </div>
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary">
-                                S'inscrire comme Candidat
-                            </button>
-                            <button type="submit"
-                                    formaction="/register/recruteur"
-                                    class="btn btn-outline-primary">
-                                S'inscrire comme Recruteur
-                            </button>
-                        </div>
-                    </form>
-                    <hr/>
-                    <p class="text-center mb-0">
-                        Déjà un compte ? <a th:href="@{/login}">Se connecter</a>
-                    </p>
+                            <div class="mb-4">
+                                <label class="form-label fw-600 text-muted small">PASSWORD</label>
+                                <input type="password" th:field="*{motDePasse}"
+                                       class="form-control form-control-modern"
+                                       placeholder="Min. 8 characters"/>
+                                <small class="text-danger" th:errors="*{motDePasse}"></small>
+                            </div>
+
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn-primary-custom d-block text-center">
+                                    <i class="bi bi-person me-2"></i>Register as Candidate
+                                </button>
+                                <button type="submit" formaction="/register/recruteur"
+                                        class="btn-outline-custom d-block text-center">
+                                    <i class="bi bi-building me-2"></i>Register as Recruiter
+                                </button>
+                            </div>
+                        </form>
+                        <hr class="my-4"/>
+                        <p class="text-center text-muted mb-0">
+                            Already have an account?
+                            <a th:href="@{/login}" style="color:var(--primary); font-weight:600;">
+                                Sign In
+                            </a>
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</main>
+</div>
+
+<th:block th:replace="~{layout/base :: scripts}"></th:block>
 </body>
 </html>

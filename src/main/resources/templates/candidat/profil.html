@@ -1,71 +1,100 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head><title>Mon profil</title></head>
+<head th:replace="~{layout/base :: head('My Profile')}"></head>
 <body>
-<nav th:replace="~{layout/base :: nav}"></nav>
-<main class="container mt-4">
-    <h2>Mon profil</h2>
-    <div th:if="${param.success}" class="alert alert-success">Profil mis à jour.</div>
-    <div th:if="${param.cvSuccess}" class="alert alert-success">CV uploadé avec succès.</div>
+<nav th:replace="~{layout/base :: navbar}"></nav>
 
-    <div class="row">
+<div class="page-header">
+    <div class="container">
+        <h1>My Profile</h1>
+        <p class="text-muted mb-0">Manage your personal information and CV</p>
+    </div>
+</div>
+
+<div class="container mb-5">
+    <div th:if="${param.success}" class="alert border-0 rounded-3 mb-4"
+         style="background:#f0fdf4; color:#16a34a;">
+        <i class="bi bi-check-circle me-2"></i>Profile updated successfully.
+    </div>
+    <div th:if="${param.cvSuccess}" class="alert border-0 rounded-3 mb-4"
+         style="background:#f0fdf4; color:#16a34a;">
+        <i class="bi bi-check-circle me-2"></i>CV uploaded successfully.
+    </div>
+
+    <div class="row g-4">
         <div class="col-md-7">
-            <div class="card mb-4">
-                <div class="card-body">
-                    <h5 class="card-title">Informations personnelles</h5>
-                    <form th:action="@{/candidat/profil}" method="post"
-                          th:object="${candidat}">
-                        <div class="row">
-                            <div class="col mb-3">
-                                <label class="form-label">Nom</label>
-                                <input type="text" th:field="*{nom}" class="form-control"/>
-                            </div>
-                            <div class="col mb-3">
-                                <label class="form-label">Prénom</label>
-                                <input type="text" th:field="*{prenom}" class="form-control"/>
-                            </div>
+            <div class="card-modern card p-4">
+                <h5 class="fw-bold mb-4">
+                    <i class="bi bi-person me-2" style="color:var(--primary)"></i>
+                    Personal Information
+                </h5>
+                <form th:action="@{/candidat/profil}" method="post" th:object="${candidat}">
+                    <div class="row">
+                        <div class="col mb-3">
+                            <label class="form-label text-muted small fw-600">FIRST NAME</label>
+                            <input type="text" th:field="*{prenom}"
+                                   class="form-control form-control-modern"/>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label">Téléphone</label>
-                            <input type="text" th:field="*{telephone}" class="form-control"/>
+                        <div class="col mb-3">
+                            <label class="form-label text-muted small fw-600">LAST NAME</label>
+                            <input type="text" th:field="*{nom}"
+                                   class="form-control form-control-modern"/>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label">Ville</label>
-                            <input type="text" th:field="*{ville}" class="form-control"/>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Enregistrer</button>
-                    </form>
-                </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted small fw-600">PHONE</label>
+                        <input type="text" th:field="*{telephone}"
+                               class="form-control form-control-modern"/>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label text-muted small fw-600">CITY</label>
+                        <input type="text" th:field="*{ville}"
+                               class="form-control form-control-modern"/>
+                    </div>
+                    <button type="submit" class="btn-primary-custom">
+                        <i class="bi bi-save me-2"></i>Save Changes
+                    </button>
+                </form>
             </div>
         </div>
 
         <div class="col-md-5">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Mon CV</h5>
-                    <div th:if="${candidat.cv != null}" class="mb-3">
-                        <p class="text-success">✓ CV déposé</p>
-                        <small class="text-muted"
-                               th:text="${#temporals.format(candidat.cv.dateUpload,'dd/MM/yyyy')}">
-                        </small>
-                    </div>
-                    <div th:unless="${candidat.cv != null}" class="mb-3">
-                        <p class="text-warning">Aucun CV déposé.</p>
-                    </div>
-                    <form th:action="@{/candidat/cv}" method="post"
-                          enctype="multipart/form-data">
-                        <div class="mb-3">
-                            <input type="file" name="file" accept=".pdf"
-                                   class="form-control"/>
-                        </div>
-                        <button type="submit" class="btn btn-outline-primary">
-                            Uploader le CV
-                        </button>
-                    </form>
+            <div class="card-modern card p-4">
+                <h5 class="fw-bold mb-4">
+                    <i class="bi bi-file-earmark-pdf me-2" style="color:var(--secondary)"></i>
+                    My CV
+                </h5>
+                <div th:if="${candidat.cv != null}"
+                     class="alert border-0 rounded-3 mb-4"
+                     style="background:#f0fdf4; color:#16a34a;">
+                    <i class="bi bi-check-circle me-2"></i>
+                    CV uploaded on
+                    <strong th:text="${#temporals.format(candidat.cv.dateUpload,'dd/MM/yyyy')}"></strong>
                 </div>
+                <div th:unless="${candidat.cv != null}"
+                     class="alert border-0 rounded-3 mb-4"
+                     style="background:#fffbeb; color:#d97706;">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    No CV uploaded yet.
+                </div>
+                <form th:action="@{/candidat/cv}" method="post" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label class="form-label text-muted small fw-600">UPLOAD PDF</label>
+                        <input type="file" name="file" accept=".pdf"
+                               class="form-control form-control-modern"/>
+                    </div>
+                    <button type="submit" class="btn-outline-custom w-100">
+                        <i class="bi bi-upload me-2"></i>Upload CV
+                    </button>
+                </form>
             </div>
         </div>
     </div>
-</main>
+</div>
+
+<footer class="footer-custom">
+    <div class="container"><p class="mb-0">© 2026 JobBoard</p></div>
+</footer>
+<th:block th:replace="~{layout/base :: scripts}"></th:block>
 </body>
 </html>

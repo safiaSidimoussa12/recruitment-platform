@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/base :: head('Company Profile')}"></head>
+<body>
+<nav th:replace="~{layout/base :: navbar}"></nav>
+
+<div class="page-header">
+    <div class="container">
+        <h1>Company Profile</h1>
+        <p class="text-muted mb-0">Update your company information</p>
+    </div>
+</div>
+
+<div class="container mb-5">
+    <div th:if="${param.success}" class="alert border-0 rounded-3 mb-4"
+         style="background:#f0fdf4; color:#16a34a;">
+        <i class="bi bi-check-circle me-2"></i>Company profile updated.
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card-modern card p-4">
+                <form th:action="@{/recruteur/entreprise}" method="post"
+                      th:object="${entreprise}">
+                    <div class="mb-3">
+                        <label class="form-label text-muted small fw-600">COMPANY NAME</label>
+                        <input type="text" th:field="*{nom}"
+                               class="form-control form-control-modern"/>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted small fw-600">DESCRIPTION</label>
+                        <textarea th:field="*{description}"
+                                  class="form-control form-control-modern" rows="4"></textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col mb-3">
+                            <label class="form-label text-muted small fw-600">SECTOR</label>
+                            <input type="text" th:field="*{secteur}"
+                                   class="form-control form-control-modern"/>
+                        </div>
+                        <div class="col mb-3">
+                            <label class="form-label text-muted small fw-600">LOCATION</label>
+                            <input type="text" th:field="*{localisation}"
+                                   class="form-control form-control-modern"/>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label text-muted small fw-600">WEBSITE</label>
+                        <input type="url" th:field="*{siteWeb}"
+                               class="form-control form-control-modern"
+                               placeholder="https://..."/>
+                    </div>
+                    <button type="submit" class="btn-primary-custom">
+                        <i class="bi bi-save me-2"></i>Save Changes
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer class="footer-custom">
+    <div class="container"><p class="mb-0">© 2026 JobBoard</p></div>
+</footer>
+<th:block th:replace="~{layout/base :: scripts}"></th:block>
+</body>
+</html>

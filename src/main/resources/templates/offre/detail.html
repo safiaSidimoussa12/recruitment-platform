@@ -1,70 +1,127 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-<head><title th:text="${offre.titre}">Offre</title></head>
+<head th:replace="~{layout/base :: head('Job Details')}"></head>
 <body>
-<nav th:replace="~{layout/base :: nav}"></nav>
-<main class="container mt-4">
-    <div class="row">
+<nav th:replace="~{layout/base :: navbar}"></nav>
+
+<div class="page-header">
+    <div class="container">
+        <a th:href="@{/offres}" class="text-muted text-decoration-none small">
+            <i class="bi bi-arrow-left me-1"></i>Back to jobs
+        </a>
+    </div>
+</div>
+
+<div class="container mb-5">
+    <div class="row g-4">
         <div class="col-md-8">
-            <h2 th:text="${offre.titre}"></h2>
-            <p class="text-muted">
-                <span th:text="${offre.entreprise.nom}"></span> —
-                <span th:text="${offre.ville}"></span>
-            </p>
-            <span class="badge bg-info text-dark me-2"
-                  th:text="${offre.typeContrat}"></span>
-            <span th:if="${offre.salaireMin}" class="badge bg-success">
-                À partir de <span th:text="${offre.salaireMin}"></span> DA
-            </span>
+            <div class="card-modern card p-4 mb-4">
+                <div class="d-flex justify-content-between align-items-start mb-4">
+                    <div>
+                        <h2 class="fw-bold mb-2" th:text="${offre.titre}"></h2>
+                        <p class="fs-5 text-muted mb-3" th:text="${offre.entreprise.nom}"></p>
+                        <div class="d-flex gap-2 flex-wrap">
+                            <span class="badge-contract" th:text="${offre.typeContrat}"></span>
+                            <span class="badge-city" th:if="${offre.ville}">
+                                <i class="bi bi-geo-alt me-1"></i>
+                                <span th:text="${offre.ville}"></span>
+                            </span>
+                            <span class="badge" style="background:#f0fdf4;color:#16a34a;padding:4px 12px;border-radius:20px"
+                                  th:if="${offre.salaireMin}">
+                                <i class="bi bi-cash me-1"></i>
+                                <span th:text="${offre.salaireMin} + ' — ' + ${offre.salaireMax} + ' DA'"></span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <hr/>
+                <h5 class="fw-bold mb-3">Job Description</h5>
+                <p class="text-muted lh-lg" th:text="${offre.description}"></p>
+            </div>
 
-            <hr/>
-            <h5>Description</h5>
-            <p th:text="${offre.description}"></p>
-
-            <hr/>
-            <!-- Postuler -->
-            <div sec:authorize="hasRole('CANDIDAT')">
-                <h5>Postuler à cette offre</h5>
+            <!-- Apply -->
+            <div class="card-modern card p-4 mb-4" sec:authorize="hasRole('CANDIDAT')">
+                <h5 class="fw-bold mb-4">
+                    <i class="bi bi-send me-2" style="color:var(--primary)"></i>
+                    Apply for this position
+                </h5>
                 <form th:action="@{/candidatures}" method="post">
                     <input type="hidden" name="offreId" th:value="${offre.id}"/>
                     <div class="mb-3">
-                        <label class="form-label">Lettre de motivation (optionnelle)</label>
-                        <textarea name="lettreMotivation" class="form-control" rows="4"></textarea>
+                        <label class="form-label text-muted small fw-600">
+                            COVER LETTER (optional)
+                        </label>
+                        <textarea name="lettreMotivation" class="form-control form-control-modern"
+                                  rows="5"
+                                  placeholder="Tell us why you're a great fit for this role..."></textarea>
                     </div>
-                    <button type="submit" class="btn btn-primary">Postuler</button>
-                </form>
-            </div>
-
-            <!-- Favori -->
-            <div sec:authorize="hasRole('CANDIDAT')" class="mt-3">
-                <form th:action="@{/candidat/favoris/toggle}" method="post">
-                    <input type="hidden" name="offreId" th:value="${offre.id}"/>
-                    <button type="submit" class="btn btn-outline-warning">
-                        ★ Sauvegarder en favori
-                    </button>
+                    <div class="d-flex gap-3">
+                        <button type="submit" class="btn-primary-custom">
+                            <i class="bi bi-send me-2"></i>Submit Application
+                        </button>
+                        <form th:action="@{/candidat/favoris/toggle}" method="post" class="d-inline">
+                            <input type="hidden" name="offreId" th:value="${offre.id}"/>
+                            <button type="submit" class="btn-outline-custom">
+                                <i class="bi bi-bookmark me-2"></i>Save Job
+                            </button>
+                        </form>
+                    </div>
                 </form>
             </div>
         </div>
 
+        <!-- Company Card -->
         <div class="col-md-4">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title"
-                        th:text="${offre.entreprise.nom}"></h5>
-                    <p th:text="${offre.entreprise.description}"></p>
-                    <p><strong>Secteur :</strong>
-                        <span th:text="${offre.entreprise.secteur}"></span></p>
-                    <p><strong>Localisation :</strong>
-                        <span th:text="${offre.entreprise.localisation}"></span></p>
-                    <a th:href="${offre.entreprise.siteWeb}"
-                       target="_blank" class="btn btn-outline-primary btn-sm">
-                        Site web
-                    </a>
+            <div class="card-modern card p-4 mb-3">
+                <h6 class="fw-bold text-muted small mb-3">COMPANY</h6>
+                <h5 class="fw-bold mb-2" th:text="${offre.entreprise.nom}"></h5>
+                <p class="text-muted small mb-3" th:text="${offre.entreprise.description}"></p>
+                <div class="d-flex flex-column gap-2">
+                    <div th:if="${offre.entreprise.secteur}">
+                        <i class="bi bi-tag me-2 text-muted"></i>
+                        <span class="small" th:text="${offre.entreprise.secteur}"></span>
+                    </div>
+                    <div th:if="${offre.entreprise.localisation}">
+                        <i class="bi bi-geo-alt me-2 text-muted"></i>
+                        <span class="small" th:text="${offre.entreprise.localisation}"></span>
+                    </div>
+                </div>
+                <a th:if="${offre.entreprise.siteWeb}" th:href="${offre.entreprise.siteWeb}"
+                   target="_blank" class="btn-outline-custom d-block text-center mt-3">
+                    <i class="bi bi-globe me-2"></i>Visit Website
+                </a>
+            </div>
+
+            <div class="card-modern card p-4">
+                <h6 class="fw-bold text-muted small mb-3">JOB DETAILS</h6>
+                <div class="d-flex flex-column gap-3">
+                    <div>
+                        <small class="text-muted d-block">Posted on</small>
+                        <span class="fw-600"
+                              th:text="${#temporals.format(offre.datePublication,'dd MMMM yyyy')}"></span>
+                    </div>
+                    <div th:if="${offre.dateCloture}">
+                        <small class="text-muted d-block">Deadline</small>
+                        <span class="fw-600"
+                              th:text="${#temporals.format(offre.dateCloture,'dd MMMM yyyy')}"></span>
+                    </div>
+                    <div>
+                        <small class="text-muted d-block">Domain</small>
+                        <span class="fw-600" th:text="${offre.domaine} ?: 'Not specified'"></span>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</main>
+</div>
+
+<footer class="footer-custom">
+    <div class="container">
+        <p class="mb-0">© 2026 JobBoard</p>
+    </div>
+</footer>
+
+<th:block th:replace="~{layout/base :: scripts}"></th:block>
 </body>
 </html>

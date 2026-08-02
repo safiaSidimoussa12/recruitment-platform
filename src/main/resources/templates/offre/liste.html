@@ -1,101 +1,150 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head><title>Offres d'emploi</title></head>
+<head th:replace="~{layout/base :: head('Browse Jobs')}"></head>
 <body>
-<nav th:replace="~{layout/base :: nav}"></nav>
-<main class="container mt-4">
+<nav th:replace="~{layout/base :: navbar}"></nav>
 
-    <h2 class="mb-4">Offres d'emploi</h2>
+<!-- Hero -->
+<div class="hero-section">
+    <div class="container text-center position-relative" style="z-index:1">
+        <h1 class="display-5 fw-bold mb-3">Find Your Dream Job</h1>
+        <p class="fs-5 opacity-75 mb-0">
+            Thousands of opportunities waiting for you
+        </p>
+    </div>
+</div>
 
-    <!-- Formulaire de recherche -->
-    <form th:action="@{/offres}" method="get" class="card p-3 mb-4 bg-light">
-        <div class="row g-2">
-            <div class="col-md-4">
-                <input type="text" name="keyword" class="form-control"
-                       placeholder="Mots-clés..." th:value="${keyword}"/>
+<!-- Search Card -->
+<div class="container">
+    <div class="search-card">
+        <form th:action="@{/offres}" method="get">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label text-muted small fw-600">KEYWORD</label>
+                    <input type="text" name="keyword" class="form-control form-control-modern"
+                           placeholder="Job title, skill..." th:value="${keyword}"/>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label text-muted small fw-600">CITY</label>
+                    <input type="text" name="ville" class="form-control form-control-modern"
+                           placeholder="Algiers..." th:value="${ville}"/>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label text-muted small fw-600">DOMAIN</label>
+                    <input type="text" name="domaine" class="form-control form-control-modern"
+                           placeholder="IT, Finance..." th:value="${domaine}"/>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label text-muted small fw-600">CONTRACT</label>
+                    <select name="typeContrat" class="form-select form-select-modern">
+                        <option value="">All types</option>
+                        <option th:each="t : ${typesContrat}" th:value="${t}"
+                                th:text="${t}" th:selected="${t == typeContrat}"></option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label text-muted small fw-600">MIN SALARY</label>
+                    <input type="number" name="salaireMin" class="form-control form-control-modern"
+                           placeholder="50000" th:value="${salaireMin}"/>
+                </div>
+                <div class="col-md-1">
+                    <button type="submit" class="btn-primary-custom w-100 d-block text-center">
+                        <i class="bi bi-search"></i>
+                    </button>
+                </div>
             </div>
-            <div class="col-md-2">
-                <input type="text" name="ville" class="form-control"
-                       placeholder="Ville" th:value="${ville}"/>
-            </div>
-            <div class="col-md-2">
-                <input type="text" name="domaine" class="form-control"
-                       placeholder="Domaine" th:value="${domaine}"/>
-            </div>
-            <div class="col-md-2">
-                <select name="typeContrat" class="form-select">
-                    <option value="">Contrat</option>
-                    <option th:each="t : ${typesContrat}"
-                            th:value="${t}" th:text="${t}"
-                            th:selected="${t == typeContrat}"></option>
-                </select>
-            </div>
-            <div class="col-md-1">
-                <input type="number" name="salaireMin" class="form-control"
-                       placeholder="Salaire min" th:value="${salaireMin}"/>
-            </div>
-            <div class="col-md-1">
-                <button type="submit" class="btn btn-primary w-100">
-                    Rechercher
-                </button>
-            </div>
-        </div>
-    </form>
+        </form>
+    </div>
+</div>
 
-    <!-- Résultats -->
-    <div th:if="${offres.isEmpty()}" class="alert alert-info">
-        Aucune offre trouvée.
+<!-- Results -->
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h5 class="fw-bold mb-0" th:text="${offres.totalElements} + ' jobs found'"></h5>
     </div>
 
-    <div class="row row-cols-1 row-cols-md-2 g-3">
-        <div class="col" th:each="offre : ${offres}">
-            <div class="card h-100 shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title" th:text="${offre.titre}"></h5>
-                    <p class="text-muted mb-1"
-                       th:text="${offre.entreprise.nom}"></p>
-                    <span class="badge bg-secondary me-1"
-                          th:text="${offre.ville}"></span>
-                    <span class="badge bg-info text-dark"
-                          th:text="${offre.typeContrat}"></span>
-                    <p class="card-text mt-2 text-truncate"
-                       th:text="${offre.description}"></p>
+    <div th:if="${offres.isEmpty()}" class="text-center py-5">
+        <i class="bi bi-search fs-1 text-muted d-block mb-3"></i>
+        <h5 class="text-muted">No jobs found matching your criteria</h5>
+        <p class="text-muted">Try adjusting your search filters</p>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-md-6" th:each="offre : ${offres}">
+            <div class="card-modern card p-4 h-100">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                        <h5 class="fw-bold mb-1" th:text="${offre.titre}"></h5>
+                        <p class="text-muted mb-0 fw-500"
+                           th:text="${offre.entreprise.nom}"></p>
+                    </div>
+                    <div class="d-flex flex-column gap-1 align-items-end">
+                        <span class="badge-contract" th:text="${offre.typeContrat}"></span>
+                    </div>
                 </div>
-                <div class="card-footer d-flex justify-content-between">
-                    <small class="text-muted"
-                           th:text="${#temporals.format(offre.datePublication,'dd/MM/yyyy')}">
+                <p class="text-muted small mb-3"
+                   style="display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden"
+                   th:text="${offre.description}"></p>
+                <div class="d-flex gap-2 flex-wrap mb-3">
+                    <span class="badge-city" th:if="${offre.ville}">
+                        <i class="bi bi-geo-alt me-1"></i>
+                        <span th:text="${offre.ville}"></span>
+                    </span>
+                    <span class="badge" style="background:#f0fdf4;color:#16a34a;padding:4px 10px;border-radius:20px;font-size:0.75rem"
+                          th:if="${offre.salaireMin}">
+                        <i class="bi bi-cash me-1"></i>
+                        <span th:text="${offre.salaireMin} + ' DA'"></span>
+                    </span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mt-auto">
+                    <small class="text-muted">
+                        <i class="bi bi-clock me-1"></i>
+                        <span th:text="${#temporals.format(offre.datePublication,'dd MMM yyyy')}"></span>
                     </small>
                     <a th:href="@{/offres/{id}(id=${offre.id})}"
-                       class="btn btn-sm btn-primary">Voir l'offre</a>
+                       class="btn-primary-custom" style="padding:8px 18px;font-size:0.875rem">
+                        View Job <i class="bi bi-arrow-right ms-1"></i>
+                    </a>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Pagination -->
-    <nav class="mt-4" th:if="${offres.totalPages > 1}">
-        <ul class="pagination justify-content-center">
+    <nav class="mt-5" th:if="${offres.totalPages > 1}">
+        <ul class="pagination justify-content-center gap-2">
             <li class="page-item" th:classappend="${offres.first} ? 'disabled'">
-                <a class="page-link"
+                <a class="page-link rounded-3 border-0 fw-600"
+                   style="color:var(--primary)"
                    th:href="@{/offres(page=${offres.number - 1}, keyword=${keyword})}">
-                    Précédent
+                    ← Prev
                 </a>
             </li>
             <li class="page-item" th:each="i : ${#numbers.sequence(0, offres.totalPages - 1)}"
                 th:classappend="${i == offres.number} ? 'active'">
-                <a class="page-link"
+                <a class="page-link rounded-3 border-0 fw-600"
                    th:href="@{/offres(page=${i}, keyword=${keyword})}"
-                   th:text="${i + 1}"></a>
+                   th:text="${i + 1}"
+                   th:style="${i == offres.number} ? 'background:var(--gradient);color:white;' : 'color:var(--primary)'">
+                </a>
             </li>
             <li class="page-item" th:classappend="${offres.last} ? 'disabled'">
-                <a class="page-link"
+                <a class="page-link rounded-3 border-0 fw-600"
+                   style="color:var(--primary)"
                    th:href="@{/offres(page=${offres.number + 1}, keyword=${keyword})}">
-                    Suivant
+                    Next →
                 </a>
             </li>
         </ul>
     </nav>
+</div>
 
-</main>
+<footer class="footer-custom">
+    <div class="container">
+        <p class="mb-0">© 2026 JobBoard — Find your next opportunity</p>
+    </div>
+</footer>
+
+<th:block th:replace="~{layout/base :: scripts}"></th:block>
 </body>
 </html>
