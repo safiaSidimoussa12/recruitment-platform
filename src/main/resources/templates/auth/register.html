@@ -20,7 +20,7 @@
                              th:text="${erreur}"></div>
 
                         <form th:action="@{/register/candidat}" method="post"
-                              th:object="${request}">
+                              th:object="${request}" id="registerForm">
                             <div class="row">
                                 <div class="col mb-3">
                                     <label class="form-label fw-600 text-muted small">FIRST NAME</label>
@@ -44,7 +44,7 @@
                                        placeholder="you@example.com"/>
                                 <small class="text-danger" th:errors="*{email}"></small>
                             </div>
-                            <div class="mb-4">
+                            <div class="mb-3">
                                 <label class="form-label fw-600 text-muted small">PASSWORD</label>
                                 <input type="password" th:field="*{motDePasse}"
                                        class="form-control form-control-modern"
@@ -52,12 +52,24 @@
                                 <small class="text-danger" th:errors="*{motDePasse}"></small>
                             </div>
 
+                            <!-- Company field — visible only for recruiter -->
+                            <div class="mb-4" id="companyField" style="display:none">
+                                <label class="form-label fw-600 text-muted small">COMPANY NAME</label>
+                                <input type="text" th:field="*{nomEntreprise}"
+                                       class="form-control form-control-modern"
+                                       placeholder="Your company name"/>
+                            </div>
+
                             <div class="d-grid gap-2">
-                                <button type="submit" class="btn-primary-custom d-block text-center">
+                                <button type="submit"
+                                        class="btn-primary-custom d-block text-center"
+                                        id="btnCandidat">
                                     <i class="bi bi-person me-2"></i>Register as Candidate
                                 </button>
-                                <button type="submit" formaction="/register/recruteur"
-                                        class="btn-outline-custom d-block text-center">
+                                <button type="submit"
+                                        formaction="/register/recruteur"
+                                        class="btn-outline-custom d-block text-center"
+                                        id="btnRecruteur">
                                     <i class="bi bi-building me-2"></i>Register as Recruiter
                                 </button>
                             </div>
@@ -75,6 +87,22 @@
         </div>
     </div>
 </div>
+
+<script>
+    const companyField = document.getElementById('companyField');
+    const btnCandidat = document.getElementById('btnCandidat');
+    const btnRecruteur = document.getElementById('btnRecruteur');
+
+    btnRecruteur.addEventListener('click', function() {
+        companyField.style.display = 'block';
+        document.querySelector('#companyField input').required = true;
+    });
+
+    btnCandidat.addEventListener('click', function() {
+        companyField.style.display = 'none';
+        document.querySelector('#companyField input').required = false;
+    });
+</script>
 
 <th:block th:replace="~{layout/base :: scripts}"></th:block>
 </body>

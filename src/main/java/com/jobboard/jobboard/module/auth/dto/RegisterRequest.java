@@ -25,4 +25,6 @@ public class RegisterRequest {
     private String prenom;
 
     private Long entrepriseId;
+
+    private String nomEntreprise;
 }

@@ -39,10 +39,22 @@ public class AuthService {
     @Transactional
     public void registerRecruteur(RegisterRequest request) {
         if (recruteurRepository.findByEmail(request.getEmail()).isPresent()) {
-            throw new IllegalArgumentException("Email déjà utilisé.");
+            throw new IllegalArgumentException("Email already in use.");
         }
-        Entreprise entreprise = entrepriseRepository.findById(request.getEntrepriseId())
-                .orElseThrow(() -> new IllegalArgumentException("Entreprise introuvable."));
+
+        // Créer une entreprise par défaut si pas fournie
+        Entreprise entreprise;
+        if (request.getEntrepriseId() != null) {
+            entreprise = entrepriseRepository.findById(request.getEntrepriseId())
+                    .orElseThrow(() -> new IllegalArgumentException("Company not found."));
+        } else {
+            entreprise = new Entreprise();
+            entreprise.setNom(request.getNomEntreprise() != null
+                    ? request.getNomEntreprise()
+                    : "My Company");
+            entreprise.setStatut(com.jobboard.jobboard.shared.domain.StatutEntreprise.ACTIVE);
+            entreprise = entrepriseRepository.save(entreprise);
+        }
 
         Recruteur recruteur = new Recruteur();
         recruteur.setEmail(request.getEmail());
