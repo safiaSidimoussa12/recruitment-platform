@@ -16,43 +16,55 @@ import org.springframework.security.web.SecurityFilterChain;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final CustomUserDetailsService userDetailsService;
+        private final CustomUserDetailsService userDetailsService;
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+        @Bean
+        public PasswordEncoder passwordEncoder() {
+                return new BCryptPasswordEncoder();
+        }
 
-    @Bean
-    public AuthenticationManager authenticationManager(
-            AuthenticationConfiguration config) throws Exception {
-        return config.getAuthenticationManager();
-    }
+        @Bean
+        public AuthenticationManager authenticationManager(
+                        AuthenticationConfiguration config) throws Exception {
+                return config.getAuthenticationManager();
+        }
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .userDetailsService(userDetailsService)
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/register/**", "/offres", "/offres/**").permitAll()
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/recruteur/**").hasRole("RECRUTEUR")
-                        .requestMatchers("/candidat/**", "/candidatures/**", "/messages/**")
-                        .hasAnyRole("CANDIDAT", "RECRUTEUR")
-                        .anyRequest().authenticated())
-                .formLogin(form -> form
-                        .loginPage("/login")
-                        .loginProcessingUrl("/login")
-                        .defaultSuccessUrl("/offres", true)
-                        .failureUrl("/login?error")
-                        .permitAll())
-                .logout(logout -> logout
-                        .logoutUrl("/logout")
-                        .logoutSuccessUrl("/login?logout")
-                        .permitAll())
-                .csrf(csrf -> csrf.disable())
-                .headers(headers -> headers
-                        .frameOptions(frame -> frame.disable()));
-        return http.build();
-    }
+        @Bean
+        public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+                http
+                                .userDetailsService(userDetailsService)
+                                .authorizeHttpRequests(auth -> auth
+                                                .requestMatchers("/login", "/register/**", "/offres", "/offres/**")
+                                                .permitAll()
+                                                .requestMatchers("/admin/**").hasRole("ADMIN")
+                                                .requestMatchers("/recruteur/**").hasRole("RECRUTEUR")
+                                                .requestMatchers("/candidat/**", "/candidatures/**", "/messages/**")
+                                                .hasAnyRole("CANDIDAT", "RECRUTEUR")
+                                                .anyRequest().authenticated())
+                                .formLogin(form -> form
+                                                .loginPage("/login")
+                                                .loginProcessingUrl("/login")
+                                                .successHandler((request, response, authentication) -> {
+                                                        String role = authentication.getAuthorities().stream()
+                                                                        .findFirst().map(a -> a.getAuthority())
+                                                                        .orElse("");
+                                                        if (role.equals("ROLE_RECRUTEUR")) {
+                                                                response.sendRedirect("/recruteur/dashboard");
+                                                        } else if (role.equals("ROLE_ADMIN")) {
+                                                                response.sendRedirect("/admin/dashboard");
+                                                        } else {
+                                                                response.sendRedirect("/offres");
+                                                        }
+                                                })
+                                                .failureUrl("/login?error")
+                                                .permitAll())
+                                .logout(logout -> logout
+                                                .logoutUrl("/logout")
+                                                .logoutSuccessUrl("/login?logout")
+                                                .permitAll())
+                                .csrf(csrf -> csrf.disable())
+                                .headers(headers -> headers
+                                                .frameOptions(frame -> frame.disable()));
+                return http.build();
+        }
 }

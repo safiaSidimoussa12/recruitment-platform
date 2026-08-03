@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 public class RecruteurController {
 
     private final RecruteurRepository recruteurRepository;
+    private final RecruteurDashboardService dashboardService;
 
     @GetMapping("/profil")
     public String profil(@AuthenticationPrincipal UserDetails userDetails, Model model) {
@@ -34,4 +35,18 @@ public class RecruteurController {
         recruteurRepository.save(recruteur);
         return "redirect:/recruteur/profil?success";
     }
+
+    @GetMapping("/dashboard")
+    public String dashboard(@AuthenticationPrincipal UserDetails userDetails, Model model) {
+        Recruteur recruteur = recruteurRepository.findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new ResourceNotFoundException("Recruiter not found."));
+
+        model.addAttribute("recruteur", recruteur);
+        model.addAttribute("totalOffres", dashboardService.countOffresActives(recruteur.getId()));
+        model.addAttribute("totalCandidatures", dashboardService.countCandidaturesRecues(recruteur.getId()));
+        model.addAttribute("messagesNonLus", dashboardService.countMessagesNonLus(recruteur.getId()));
+        model.addAttribute("recentOffres", dashboardService.getRecentOffres(recruteur.getId()));
+        return "recruteur/dashboard";
+    }
+
 }
