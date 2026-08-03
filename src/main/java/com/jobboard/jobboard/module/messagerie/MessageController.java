@@ -43,6 +43,7 @@ public class MessageController {
         model.addAttribute("messages", messageService.findByCandidature(candidatureId));
         model.addAttribute("candidatureId", candidatureId);
         model.addAttribute("destinataireId", destinataireId);
+        model.addAttribute("currentUserEmail", userDetails.getUsername());
         return "messagerie/conversation";
     }
 

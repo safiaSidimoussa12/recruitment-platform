@@ -23,43 +23,70 @@
                     </h6>
                 </div>
 
-                <div class="p-4" style="height:420px;overflow-y:auto;" id="chatBox">
+                <!-- Chat messages -->
+                <div class="p-4" style="height:460px;overflow-y:auto;" id="chatBox">
                     <div th:if="${messages.isEmpty()}" class="text-center py-5 text-muted">
                         <i class="bi bi-chat fs-1 d-block mb-2"></i>
                         No messages yet. Start the conversation!
                     </div>
+
                     <div th:each="m : ${messages}" class="mb-3">
-                        <div class="d-flex gap-3">
+                        <!-- My message (right) -->
+                        <div th:if="${m.expediteur.email == currentUserEmail}"
+                             class="d-flex justify-content-end align-items-end gap-2">
+                            <div style="max-width:70%">
+                                <div class="p-3 rounded-3 text-white"
+                                     style="background:var(--gradient);border-radius:18px 18px 4px 18px !important">
+                                    <p class="mb-0 small" th:text="${m.contenu}"></p>
+                                </div>
+                                <div class="text-end mt-1">
+                                    <small class="text-muted"
+                                           style="font-size:0.7rem"
+                                           th:text="${#temporals.format(m.dateEnvoi,'HH:mm')}"></small>
+                                </div>
+                            </div>
                             <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
-                                 style="width:36px;height:36px;background:var(--gradient);color:white;font-weight:700;font-size:0.8rem"
+                                 style="width:32px;height:32px;background:var(--gradient);color:white;font-weight:700;font-size:0.75rem"
                                  th:text="${#strings.substring(m.expediteur.email,0,1).toUpperCase()}">
                             </div>
-                            <div class="flex-grow-1">
-                                <div class="d-flex gap-2 align-items-baseline mb-1">
-                                    <small class="fw-600"
-                                           th:text="${m.expediteur.email}"></small>
-                                    <small class="text-muted"
-                                           th:text="${#temporals.format(m.dateEnvoi,'dd MMM, HH:mm')}"></small>
-                                </div>
-                                <div class="p-3 rounded-3"
-                                     style="background:#f8fafc;border:1px solid #e2e8f0">
+                        </div>
+
+                        <!-- Other person message (left) -->
+                        <div th:unless="${m.expediteur.email == currentUserEmail}"
+                             class="d-flex justify-content-start align-items-end gap-2">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+                                 style="width:32px;height:32px;background:linear-gradient(135deg,#ec4899,#f43f5e);color:white;font-weight:700;font-size:0.75rem"
+                                 th:text="${#strings.substring(m.expediteur.email,0,1).toUpperCase()}">
+                            </div>
+                            <div style="max-width:70%">
+                                <small class="text-muted d-block mb-1"
+                                       style="font-size:0.75rem"
+                                       th:text="${m.expediteur.email}"></small>
+                                <div class="p-3"
+                                     style="background:#f1f5f9;border-radius:18px 18px 18px 4px">
                                     <p class="mb-0 small" th:text="${m.contenu}"></p>
+                                </div>
+                                <div class="mt-1">
+                                    <small class="text-muted"
+                                           style="font-size:0.7rem"
+                                           th:text="${#temporals.format(m.dateEnvoi,'HH:mm')}"></small>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <!-- Input -->
                 <div class="p-4 border-top" style="background:#f8fafc">
                     <form th:action="@{/messages/{id}(id=${candidatureId})}" method="post">
-                       <input type="hidden" name="destinataireId" th:value="${destinataireId}"/>
-                        <div class="d-flex gap-3">
+                        <input type="hidden" name="destinataireId" th:value="${destinataireId}"/>
+                        <div class="d-flex gap-3 align-items-end">
                             <textarea name="contenu" class="form-control form-control-modern"
                                       rows="2" placeholder="Type your message..." required
-                                      style="resize:none"></textarea>
-                            <button type="submit" class="btn-primary-custom flex-shrink-0"
-                                    style="padding:8px 20px">
-                                <i class="bi bi-send"></i>
+                                      style="resize:none;border-radius:16px"></textarea>
+                            <button type="submit" class="btn-primary-custom flex-shrink-0 d-flex align-items-center justify-content-center"
+                                    style="width:48px;height:48px;padding:0;border-radius:50%">
+                                <i class="bi bi-send-fill"></i>
                             </button>
                         </div>
                     </form>
