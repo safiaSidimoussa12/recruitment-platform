@@ -19,10 +19,15 @@ public class FavoriController {
 
     @PostMapping("/candidat/favoris/toggle")
     public String toggle(@RequestParam Long offreId,
+            @RequestParam(required = false) String from,
             @AuthenticationPrincipal UserDetails userDetails) {
         Candidat candidat = candidatRepository.findByEmail(userDetails.getUsername())
                 .orElseThrow(() -> new ResourceNotFoundException("Candidat introuvable."));
         favoriService.toggleFavori(candidat.getId(), offreId);
+
+        if ("favoris".equals(from)) {
+            return "redirect:/candidat/favoris?removed";
+        }
         return "redirect:/offres/" + offreId;
     }
 
