@@ -16,6 +16,8 @@
 <div class="container mb-5">
     <div class="row g-4">
         <div class="col-md-8">
+
+            <!-- Job Info -->
             <div class="card-modern card p-4 mb-4">
                 <div class="d-flex justify-content-between align-items-start mb-4">
                     <div>
@@ -27,7 +29,8 @@
                                 <i class="bi bi-geo-alt me-1"></i>
                                 <span th:text="${offre.ville}"></span>
                             </span>
-                            <span class="badge" style="background:#f0fdf4;color:#16a34a;padding:4px 12px;border-radius:20px"
+                            <span class="badge"
+                                  style="background:#f0fdf4;color:#16a34a;padding:4px 12px;border-radius:20px"
                                   th:if="${offre.salaireMin}">
                                 <i class="bi bi-cash me-1"></i>
                                 <span th:text="${offre.salaireMin} + ' — ' + ${offre.salaireMax} + ' DA'"></span>
@@ -52,23 +55,34 @@
                         <label class="form-label text-muted small fw-600">
                             COVER LETTER (optional)
                         </label>
-                        <textarea name="lettreMotivation" class="form-control form-control-modern"
+                        <textarea name="lettreMotivation"
+                                  class="form-control form-control-modern"
                                   rows="5"
                                   placeholder="Tell us why you're a great fit for this role..."></textarea>
                     </div>
-                    <div class="d-flex gap-3">
-                        <button type="submit" class="btn-primary-custom">
-                            <i class="bi bi-send me-2"></i>Submit Application
-                        </button>
-                        <form th:action="@{/candidat/favoris/toggle}" method="post" class="d-inline">
-                            <input type="hidden" name="offreId" th:value="${offre.id}"/>
-                            <button type="submit" class="btn-outline-custom">
-                                <i class="bi bi-bookmark me-2"></i>Save Job
-                            </button>
-                        </form>
-                    </div>
+                    <button type="submit" class="btn-primary-custom">
+                        <i class="bi bi-send me-2"></i>Submit Application
+                    </button>
                 </form>
             </div>
+
+            <!-- Save Job -->
+            <div class="card-modern card p-4 mb-4" sec:authorize="hasRole('CANDIDAT')">
+                <h5 class="fw-bold mb-3">
+                    <i class="bi bi-bookmark me-2" style="color:var(--secondary)"></i>
+                    Save this job
+                </h5>
+                <p class="text-muted small mb-3">
+                    Save this job to review it later from your Saved Jobs page.
+                </p>
+                <form th:action="@{/candidat/favoris/toggle}" method="post">
+                    <input type="hidden" name="offreId" th:value="${offre.id}"/>
+                    <button type="submit" class="btn-outline-custom">
+                        <i class="bi bi-bookmark me-2"></i>Save Job
+                    </button>
+                </form>
+            </div>
+
         </div>
 
         <!-- Company Card -->
@@ -76,7 +90,8 @@
             <div class="card-modern card p-4 mb-3">
                 <h6 class="fw-bold text-muted small mb-3">COMPANY</h6>
                 <h5 class="fw-bold mb-2" th:text="${offre.entreprise.nom}"></h5>
-                <p class="text-muted small mb-3" th:text="${offre.entreprise.description}"></p>
+                <p class="text-muted small mb-3"
+                   th:text="${offre.entreprise.description}"></p>
                 <div class="d-flex flex-column gap-2">
                     <div th:if="${offre.entreprise.secteur}">
                         <i class="bi bi-tag me-2 text-muted"></i>
@@ -87,7 +102,8 @@
                         <span class="small" th:text="${offre.entreprise.localisation}"></span>
                     </div>
                 </div>
-                <a th:if="${offre.entreprise.siteWeb}" th:href="${offre.entreprise.siteWeb}"
+                <a th:if="${offre.entreprise.siteWeb}"
+                   th:href="${offre.entreprise.siteWeb}"
                    target="_blank" class="btn-outline-custom d-block text-center mt-3">
                     <i class="bi bi-globe me-2"></i>Visit Website
                 </a>
@@ -108,7 +124,8 @@
                     </div>
                     <div>
                         <small class="text-muted d-block">Domain</small>
-                        <span class="fw-600" th:text="${offre.domaine} ?: 'Not specified'"></span>
+                        <span class="fw-600"
+                              th:text="${offre.domaine} ?: 'Not specified'"></span>
                     </div>
                 </div>
             </div>
