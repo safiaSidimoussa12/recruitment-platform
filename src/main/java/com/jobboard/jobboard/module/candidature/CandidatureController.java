@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequiredArgsConstructor
@@ -22,15 +23,16 @@ public class CandidatureController {
     public String postuler(@RequestParam Long offreId,
             @RequestParam(required = false) String lettreMotivation,
             @AuthenticationPrincipal UserDetails userDetails,
-            Model model) {
+            RedirectAttributes redirectAttributes) {
         Candidat candidat = candidatRepository.findByEmail(userDetails.getUsername())
                 .orElseThrow(() -> new ResourceNotFoundException("Candidat introuvable."));
         try {
             candidatureService.postuler(candidat.getId(), offreId, lettreMotivation);
-            return "redirect:/candidat/candidatures?success";
+            redirectAttributes.addFlashAttribute("success", "Application submitted successfully!");
+            return "redirect:/candidat/candidatures";
         } catch (IllegalStateException e) {
-            model.addAttribute("erreur", e.getMessage());
-            return "redirect:/offres/" + offreId + "?erreur";
+            redirectAttributes.addFlashAttribute("erreurOffre", e.getMessage());
+            return "redirect:/offres/" + offreId;
         }
     }
 

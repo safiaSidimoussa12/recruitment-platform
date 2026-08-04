@@ -44,27 +44,51 @@
             </div>
 
             <!-- Apply -->
-            <div class="card-modern card p-4 mb-4" sec:authorize="hasRole('CANDIDAT')">
-                <h5 class="fw-bold mb-4">
-                    <i class="bi bi-send me-2" style="color:var(--primary)"></i>
-                    Apply for this position
-                </h5>
-                <form th:action="@{/candidatures}" method="post">
-                    <input type="hidden" name="offreId" th:value="${offre.id}"/>
-                    <div class="mb-3">
-                        <label class="form-label text-muted small fw-600">
-                            COVER LETTER (optional)
-                        </label>
-                        <textarea name="lettreMotivation"
-                                  class="form-control form-control-modern"
-                                  rows="5"
-                                  placeholder="Tell us why you're a great fit for this role..."></textarea>
-                    </div>
-                    <button type="submit" class="btn-primary-custom">
-                        <i class="bi bi-send me-2"></i>Submit Application
-                    </button>
-                </form>
-            </div>
+            <!-- Apply -->
+<div class="card-modern card p-4 mb-4" sec:authorize="hasRole('CANDIDAT')">
+    <h5 class="fw-bold mb-4">
+        <i class="bi bi-send me-2" style="color:var(--primary)"></i>
+        Apply for this position
+    </h5>
+
+    <!-- Erreur doublon -->
+    <div th:if="${erreurOffre}" class="alert border-0 rounded-3 mb-3"
+         style="background:#fef2f2; color:#dc2626;">
+        <i class="bi bi-exclamation-circle me-2"></i>
+        <span th:text="${erreurOffre}"></span>
+    </div>
+
+    <!-- Déjà postulé -->
+    <div th:if="${dejaPostule}" class="alert border-0 rounded-3 d-flex align-items-center gap-3"
+         style="background:#f0fdf4; color:#16a34a;">
+        <i class="bi bi-check-circle-fill fs-4"></i>
+        <div>
+            <div class="fw-bold">Application Already Submitted</div>
+            <small>You have already applied for this position.</small>
+        </div>
+        <a th:href="@{/candidat/candidatures}" class="ms-auto btn-primary-custom"
+           style="padding:6px 14px;font-size:0.8rem">
+            View My Applications
+        </a>
+    </div>
+
+    <!-- Formulaire si pas encore postulé -->
+    <form th:unless="${dejaPostule}" th:action="@{/candidatures}" method="post">
+        <input type="hidden" name="offreId" th:value="${offre.id}"/>
+        <div class="mb-3">
+            <label class="form-label text-muted small fw-600">
+                COVER LETTER (optional)
+            </label>
+            <textarea name="lettreMotivation"
+                      class="form-control form-control-modern"
+                      rows="5"
+                      placeholder="Tell us why you're a great fit for this role..."></textarea>
+        </div>
+        <button type="submit" class="btn-primary-custom">
+            <i class="bi bi-send me-2"></i>Submit Application
+        </button>
+    </form>
+</div>
 
             <!-- Save Job -->
             <div class="card-modern card p-4 mb-4" sec:authorize="hasRole('CANDIDAT')">

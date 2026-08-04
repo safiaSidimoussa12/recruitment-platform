@@ -1,5 +1,7 @@
 package com.jobboard.jobboard.module.offre;
 
+import com.jobboard.jobboard.module.candidat.CandidatRepository;
+import com.jobboard.jobboard.module.candidature.CandidatureRepository;
 import com.jobboard.jobboard.module.recruteur.Recruteur;
 import com.jobboard.jobboard.module.recruteur.RecruteurRepository;
 import com.jobboard.jobboard.shared.domain.StatutOffre;
@@ -21,6 +23,8 @@ public class OffreController {
 
     private final OffreService offreService;
     private final RecruteurRepository recruteurRepository;
+    private final CandidatRepository candidatRepository;
+    private final CandidatureRepository candidatureRepository;
 
     // ── Public ──────────────────────────────────────────
 
@@ -45,12 +49,23 @@ public class OffreController {
     }
 
     @GetMapping("/offres/{id}")
-    public String detail(@PathVariable Long id, Model model) {
+    public String detail(@PathVariable Long id,
+            @AuthenticationPrincipal UserDetails userDetails,
+            Model model) {
         Offre offre = offreService.findById(id);
         model.addAttribute("offre", offre);
+
+        // Vérifie si le candidat a déjà postulé
+        if (userDetails != null) {
+            candidatRepository.findByEmail(userDetails.getUsername()).ifPresent(candidat -> {
+                boolean dejaPostule = candidatureRepository
+                        .existsByCandidatAndOffre(candidat, offre);
+                model.addAttribute("dejaPostule", dejaPostule);
+            });
+        }
+
         return "offre/detail";
     }
-
     // ── Recruteur ────────────────────────────────────────
 
     @GetMapping("/recruteur/offres/new")
