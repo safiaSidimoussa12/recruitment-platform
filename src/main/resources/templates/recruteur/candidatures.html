@@ -8,7 +8,7 @@
     <div class="container d-flex justify-content-between align-items-center">
         <div>
             <h1>Applications Received</h1>
-            <p class="text-muted mb-0">Review and manage candidates</p>
+            <p class="text-muted mb-0">Manage your hiring pipeline</p>
         </div>
         <a th:href="@{/recruteur/offres}" class="btn-outline-custom">
             <i class="bi bi-arrow-left me-1"></i>Back to Jobs
@@ -17,6 +17,13 @@
 </div>
 
 <div class="container mb-5">
+
+    <div th:if="${success}" class="alert border-0 rounded-3 mb-4"
+         style="background:#f0fdf4;color:#16a34a;">
+        <i class="bi bi-check-circle me-2"></i>
+        <span th:text="${success}"></span>
+    </div>
+
     <div th:if="${candidatures.isEmpty()}" class="text-center py-5">
         <i class="bi bi-inbox fs-1 text-muted d-block mb-3"></i>
         <h5 class="text-muted">No applications received yet</h5>
@@ -25,96 +32,183 @@
     <div class="row g-3" th:unless="${candidatures.isEmpty()}">
         <div class="col-12" th:each="c : ${candidatures}">
             <div class="card-modern card p-4">
-                <div class="d-flex justify-content-between align-items-start">
-                    <div class="flex-grow-1">
 
-                        <!-- Candidate info -->
-                        <div class="d-flex align-items-center gap-3 mb-2">
-                            <div class="rounded-circle d-flex align-items-center justify-content-center"
-                                 style="width:44px;height:44px;background:var(--gradient);color:white;font-weight:700;font-size:1.1rem"
-                                 th:text="${#strings.substring(c.candidat.prenom,0,1) + #strings.substring(c.candidat.nom,0,1)}">
-                            </div>
-                            <div>
-                                <h6 class="fw-bold mb-0"
-                                    th:text="${c.candidat.prenom + ' ' + c.candidat.nom}"></h6>
-                                <small class="text-muted" th:text="${c.candidat.email}"></small>
-                            </div>
-                        </div>
-
-                        <!-- Status + date -->
-                        <div class="d-flex gap-2 align-items-center mb-3">
-                            <span th:if="${c.statut.name() == 'EN_ATTENTE'}"
-                                  class="badge-status-pending">
-                                <i class="bi bi-hourglass me-1"></i>Pending
+                <!-- Header -->
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center"
+                         style="width:48px;height:48px;background:var(--gradient);color:white;font-weight:700;font-size:1.1rem"
+                         th:text="${#strings.substring(c.candidat.prenom,0,1) + #strings.substring(c.candidat.nom,0,1)}">
+                    </div>
+                    <div>
+                        <h6 class="fw-bold mb-0"
+                            th:text="${c.candidat.prenom + ' ' + c.candidat.nom}"></h6>
+                        <small class="text-muted" th:text="${c.candidat.email}"></small>
+                    </div>
+                    <div class="ms-auto d-flex align-items-center gap-2">
+                        <!-- Status badge -->
+                        <span th:switch="${c.statut.name()}">
+                            <span th:case="'APPLIED'" class="badge rounded-pill"
+                                  style="background:#e0e7ff;color:#4f46e5;padding:6px 14px">
+                                📋 Applied
                             </span>
-                            <span th:if="${c.statut.name() == 'ACCEPTEE'}"
-                                  class="badge-status-accepted">
-                                <i class="bi bi-check-circle me-1"></i>Accepted
+                            <span th:case="'REVIEWED'" class="badge rounded-pill"
+                                  style="background:#fef3c7;color:#d97706;padding:6px 14px">
+                                👁 Reviewed
                             </span>
-                            <span th:if="${c.statut.name() == 'REFUSEE'}"
-                                  class="badge-status-refused">
-                                <i class="bi bi-x-circle me-1"></i>Refused
+                            <span th:case="'SHORTLISTED'" class="badge rounded-pill"
+                                  style="background:#dbeafe;color:#2563eb;padding:6px 14px">
+                                ⭐ Shortlisted
                             </span>
-                            <small class="text-muted">
-                                Applied
-                                <span th:text="${#temporals.format(c.dateSoumission,'dd MMM yyyy')}"></span>
-                            </small>
-                        </div>
-
-                        <!-- CV button -->
-                        <div class="mb-3">
-                            <a th:if="${c.candidat.cv != null}"
-                               th:href="@{/candidat/cv/download/{id}(id=${c.candidat.id})}"
-                               target="_blank"
-                               class="btn btn-sm border"
-                               style="border-radius:8px;color:#6366f1;border-color:#c7d2fe;font-size:0.8rem">
-                                <i class="bi bi-file-earmark-pdf me-1"></i>View CV
-                            </a>
-                            <span th:unless="${c.candidat.cv != null}"
-                                  class="text-muted small">
-                                <i class="bi bi-file-earmark-x me-1"></i>No CV uploaded
+                            <span th:case="'INTERVIEW_SCHEDULED'" class="badge rounded-pill"
+                                  style="background:#d1fae5;color:#059669;padding:6px 14px">
+                                📅 Interview Scheduled
                             </span>
-                        </div>
-
-                        <!-- Cover letter -->
-                        <div th:if="${c.lettreMotivation}"
-                             class="bg-light rounded-3 p-3 mb-3">
-                            <small class="text-muted fw-600 d-block mb-1">COVER LETTER</small>
-                            <p class="small mb-0" th:text="${c.lettreMotivation}"></p>
-                        </div>
-
-                        <!-- Action buttons -->
-                        <div class="d-flex gap-2 flex-wrap">
-                            <form th:if="${c.statut.name() == 'EN_ATTENTE'}"
-                                  th:action="@{/recruteur/candidatures/{id}/traiter(id=${c.id})}"
-                                  method="post">
-                                <input type="hidden" name="offreId" th:value="${offreId}"/>
-                                <input type="hidden" name="statut" value="ACCEPTEE"/>
-                                <button type="submit" class="btn-primary-custom"
-                                        style="padding:8px 18px;font-size:0.85rem">
-                                    <i class="bi bi-check-lg me-1"></i>Accept
-                                </button>
-                            </form>
-                            <form th:if="${c.statut.name() == 'EN_ATTENTE'}"
-                                  th:action="@{/recruteur/candidatures/{id}/traiter(id=${c.id})}"
-                                  method="post">
-                                <input type="hidden" name="offreId" th:value="${offreId}"/>
-                                <input type="hidden" name="statut" value="REFUSEE"/>
-                                <button type="submit" class="btn btn-sm border"
-                                        style="border-radius:10px;padding:8px 18px;color:#ef4444;border-color:#fecaca">
-                                    <i class="bi bi-x-lg me-1"></i>Refuse
-                                </button>
-                            </form>
-                            <a th:if="${c.statut.name() == 'EN_ATTENTE' or c.statut.name() == 'ACCEPTEE'}"
-                               th:href="@{/messages/{id}(id=${c.id})}"
-                               class="btn-outline-custom"
-                               style="padding:8px 16px;font-size:0.85rem">
-                                <i class="bi bi-chat me-1"></i>Message
-                            </a>
-                        </div>
-
+                            <span th:case="'INTERVIEW_COMPLETED'" class="badge rounded-pill"
+                                  style="background:#ede9fe;color:#7c3aed;padding:6px 14px">
+                                ✅ Interview Completed
+                            </span>
+                            <span th:case="'OFFER_SENT'" class="badge rounded-pill"
+                                  style="background:#fce7f3;color:#be185d;padding:6px 14px">
+                                📨 Offer Sent
+                            </span>
+                            <span th:case="'HIRED'" class="badge rounded-pill"
+                                  style="background:#d1fae5;color:#065f46;padding:6px 14px;font-weight:700">
+                                🎉 Hired
+                            </span>
+                            <span th:case="'REJECTED'" class="badge rounded-pill"
+                                  style="background:#fee2e2;color:#dc2626;padding:6px 14px">
+                                ❌ Rejected
+                            </span>
+                        </span>
+                        <small class="text-muted">
+                            Applied
+                            <span th:text="${#temporals.format(c.dateSoumission,'dd MMM yyyy')}"></span>
+                        </small>
                     </div>
                 </div>
+
+                <!-- CV + Cover Letter -->
+                <div class="d-flex gap-3 mb-3">
+                    <a th:if="${c.candidat.cv != null}"
+                       th:href="@{/candidat/cv/download/{id}(id=${c.candidat.id})}"
+                       target="_blank" class="btn btn-sm border"
+                       style="border-radius:8px;color:#6366f1;border-color:#c7d2fe;font-size:0.8rem">
+                        <i class="bi bi-file-earmark-pdf me-1"></i>View CV
+                    </a>
+                    <span th:unless="${c.candidat.cv != null}" class="text-muted small">
+                        <i class="bi bi-file-earmark-x me-1"></i>No CV
+                    </span>
+                </div>
+
+                <div th:if="${c.lettreMotivation}" class="bg-light rounded-3 p-3 mb-3">
+                    <small class="text-muted fw-600 d-block mb-1">COVER LETTER</small>
+                    <p class="small mb-0" th:text="${c.lettreMotivation}"></p>
+                </div>
+
+                <!-- Pipeline Actions -->
+                <div th:unless="${c.statut.name() == 'HIRED' or c.statut.name() == 'REJECTED'}"
+                     class="border-top pt-3 mt-2">
+                    <small class="text-muted fw-600 d-block mb-2">PIPELINE ACTIONS</small>
+                    <div class="d-flex gap-2 flex-wrap">
+
+                        <!-- Mark as Reviewed -->
+                        <form th:if="${c.statut.name() == 'APPLIED'}"
+                              th:action="@{/recruteur/candidatures/{id}/statut(id=${c.id})}"
+                              method="post">
+                            <input type="hidden" name="offreId" th:value="${offreId}"/>
+                            <input type="hidden" name="statut" value="REVIEWED"/>
+                            <button type="submit" class="btn btn-sm border"
+                                    style="border-radius:8px;color:#d97706;border-color:#fde68a;font-size:0.8rem">
+                                👁 Mark as Reviewed
+                            </button>
+                        </form>
+
+                        <!-- Shortlist -->
+                        <form th:if="${c.statut.name() == 'APPLIED' or c.statut.name() == 'REVIEWED'}"
+                              th:action="@{/recruteur/candidatures/{id}/statut(id=${c.id})}"
+                              method="post">
+                            <input type="hidden" name="offreId" th:value="${offreId}"/>
+                            <input type="hidden" name="statut" value="SHORTLISTED"/>
+                            <button type="submit" class="btn btn-sm border"
+                                    style="border-radius:8px;color:#2563eb;border-color:#bfdbfe;font-size:0.8rem">
+                                ⭐ Shortlist
+                            </button>
+                        </form>
+
+                        <!-- Schedule Interview -->
+                        <a th:if="${c.statut.name() == 'SHORTLISTED' or c.statut.name() == 'REVIEWED'}"
+                           th:href="@{/recruteur/candidatures/{id}/interview(id=${c.id})}"
+                           class="btn btn-sm border"
+                           style="border-radius:8px;color:#059669;border-color:#a7f3d0;font-size:0.8rem">
+                            📅 Schedule Interview
+                        </a>
+
+                        <!-- Interview Completed -->
+                        <form th:if="${c.statut.name() == 'INTERVIEW_SCHEDULED'}"
+                              th:action="@{/recruteur/candidatures/{id}/statut(id=${c.id})}"
+                              method="post">
+                            <input type="hidden" name="offreId" th:value="${offreId}"/>
+                            <input type="hidden" name="statut" value="INTERVIEW_COMPLETED"/>
+                            <button type="submit" class="btn btn-sm border"
+                                    style="border-radius:8px;color:#7c3aed;border-color:#ddd6fe;font-size:0.8rem">
+                                ✅ Mark Interview Done
+                            </button>
+                        </form>
+
+                        <!-- Send Offer -->
+                        <form th:if="${c.statut.name() == 'INTERVIEW_COMPLETED'}"
+                              th:action="@{/recruteur/candidatures/{id}/statut(id=${c.id})}"
+                              method="post">
+                            <input type="hidden" name="offreId" th:value="${offreId}"/>
+                            <input type="hidden" name="statut" value="OFFER_SENT"/>
+                            <button type="submit" class="btn-primary-custom"
+                                    style="padding:6px 14px;font-size:0.8rem">
+                                📨 Send Offer
+                            </button>
+                        </form>
+
+                        <!-- Hire -->
+                        <form th:if="${c.statut.name() == 'OFFER_SENT'}"
+                              th:action="@{/recruteur/candidatures/{id}/statut(id=${c.id})}"
+                              method="post">
+                            <input type="hidden" name="offreId" th:value="${offreId}"/>
+                            <input type="hidden" name="statut" value="HIRED"/>
+                            <button type="submit" class="btn btn-sm"
+                                    style="border-radius:8px;background:#d1fae5;color:#065f46;font-size:0.8rem;border:1px solid #6ee7b7">
+                                🎉 Mark as Hired
+                            </button>
+                        </form>
+
+                        <!-- Reject (always visible) -->
+                        <form th:action="@{/recruteur/candidatures/{id}/statut(id=${c.id})}"
+                              method="post">
+                            <input type="hidden" name="offreId" th:value="${offreId}"/>
+                            <input type="hidden" name="statut" value="REJECTED"/>
+                            <button type="submit" class="btn btn-sm border"
+                                    style="border-radius:8px;color:#ef4444;border-color:#fecaca;font-size:0.8rem">
+                                ❌ Reject
+                            </button>
+                        </form>
+
+                        <!-- Message -->
+                        <a th:href="@{/messages/{id}(id=${c.id})}"
+                           class="btn-outline-custom"
+                           style="padding:6px 14px;font-size:0.8rem">
+                            <i class="bi bi-chat me-1"></i>Message
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Final state -->
+                <div th:if="${c.statut.name() == 'HIRED' or c.statut.name() == 'REJECTED'}"
+                     class="border-top pt-3 mt-2 d-flex gap-2">
+                    <a th:href="@{/messages/{id}(id=${c.id})}"
+                       class="btn-outline-custom"
+                       style="padding:6px 14px;font-size:0.8rem">
+                        <i class="bi bi-chat me-1"></i>Message
+                    </a>
+                </div>
+
             </div>
         </div>
     </div>

@@ -18,6 +18,7 @@ public class CandidatureService {
     private final CandidatureRepository candidatureRepository;
     private final CandidatRepository candidatRepository;
     private final OffreRepository offreRepository;
+    private final InterviewDetailsRepository interviewDetailsRepository;
 
     @Transactional
     public Candidature postuler(Long candidatId, Long offreId, String lettreMotivation) {
@@ -27,14 +28,14 @@ public class CandidatureService {
                 .orElseThrow(() -> new ResourceNotFoundException("Offre introuvable."));
 
         if (candidatureRepository.existsByCandidatAndOffre(candidat, offre)) {
-            throw new IllegalStateException("Vous avez déjà postulé à cette offre.");
+            throw new IllegalStateException("You have already applied for this job.");
         }
 
         Candidature candidature = new Candidature();
         candidature.setCandidat(candidat);
         candidature.setOffre(offre);
         candidature.setLettreMotivation(lettreMotivation);
-        candidature.setStatut(StatutCandidature.EN_ATTENTE);
+        candidature.setStatut(StatutCandidature.APPLIED);
         return candidatureRepository.save(candidature);
     }
 
@@ -47,13 +48,40 @@ public class CandidatureService {
     }
 
     @Transactional
-    public Candidature traiter(Long candidatureId, StatutCandidature statut) {
+    public Candidature changerStatut(Long candidatureId, StatutCandidature statut) {
         Candidature candidature = candidatureRepository.findById(candidatureId)
                 .orElseThrow(() -> new ResourceNotFoundException("Candidature introuvable."));
-        if (candidature.getStatut() != StatutCandidature.EN_ATTENTE) {
-            throw new IllegalStateException("Candidature déjà traitée.");
+        if (candidature.getStatut() == StatutCandidature.HIRED ||
+                candidature.getStatut() == StatutCandidature.REJECTED) {
+            throw new IllegalStateException("Cannot change status of a finalized application.");
         }
         candidature.setStatut(statut);
         return candidatureRepository.save(candidature);
+    }
+
+    @Transactional
+    public Candidature scheduleInterview(Long candidatureId, InterviewRequest request) {
+        Candidature candidature = candidatureRepository.findById(candidatureId)
+                .orElseThrow(() -> new ResourceNotFoundException("Candidature introuvable."));
+
+        InterviewDetails details = interviewDetailsRepository
+                .findByCandidatureId(candidatureId)
+                .orElse(new InterviewDetails());
+
+        details.setCandidature(candidature);
+        details.setInterviewDate(request.getInterviewDate());
+        details.setInterviewTime(request.getInterviewTime());
+        details.setLocation(request.getLocation());
+        details.setInterviewer(request.getInterviewer());
+        details.setNotes(request.getNotes());
+        interviewDetailsRepository.save(details);
+
+        candidature.setStatut(StatutCandidature.INTERVIEW_SCHEDULED);
+        return candidatureRepository.save(candidature);
+    }
+
+    public Candidature findById(Long id) {
+        return candidatureRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Candidature introuvable."));
     }
 }

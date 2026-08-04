@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/base :: head('Schedule Interview')}"></head>
+<body>
+<nav th:replace="~{layout/base :: navbar}"></nav>
+
+<div class="page-header">
+    <div class="container">
+        <h1>Schedule Interview</h1>
+        <p class="text-muted mb-0"
+           th:text="${candidature.candidat.prenom + ' ' + candidature.candidat.nom + ' — ' + candidature.offre.titre}">
+        </p>
+    </div>
+</div>
+
+<div class="container mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-7">
+            <div class="card-modern card p-4">
+
+                <!-- Existing details banner -->
+                <div th:if="${existingDetails}" class="alert border-0 rounded-3 mb-4"
+                     style="background:#eff6ff;color:#2563eb;">
+                    <i class="bi bi-info-circle me-2"></i>
+                    An interview is already scheduled. You can update the details below.
+                </div>
+
+                <form th:action="@{/recruteur/candidatures/{id}/interview(id=${candidature.id})}"
+                      method="post" th:object="${request}">
+
+                    <div class="row">
+                        <div class="col mb-3">
+                            <label class="form-label text-muted small fw-600">
+                                📅 INTERVIEW DATE
+                            </label>
+                            <input type="date" th:field="*{interviewDate}"
+                                   class="form-control form-control-modern"
+                                   th:value="${existingDetails?.interviewDate}" required/>
+                        </div>
+                        <div class="col mb-3">
+                            <label class="form-label text-muted small fw-600">
+                                🕒 TIME
+                            </label>
+                            <input type="time" th:field="*{interviewTime}"
+                                   class="form-control form-control-modern"
+                                   th:value="${existingDetails?.interviewTime}" required/>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label text-muted small fw-600">
+                            📍 LOCATION / MEETING LINK
+                        </label>
+                        <input type="text" th:field="*{location}"
+                               class="form-control form-control-modern"
+                               placeholder="e.g. Google Meet, Office Room 3, Zoom..."
+                               th:value="${existingDetails?.location}" required/>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label text-muted small fw-600">
+                            👤 INTERVIEWER(S)
+                        </label>
+                        <input type="text" th:field="*{interviewer}"
+                               class="form-control form-control-modern"
+                               placeholder="e.g. John Smith, Jane Doe"
+                               th:value="${existingDetails?.interviewer}"/>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label text-muted small fw-600">
+                            📝 NOTES (optional)
+                        </label>
+                        <textarea th:field="*{notes}"
+                                  class="form-control form-control-modern"
+                                  rows="4"
+                                  placeholder="e.g. Technical interview — Java & Spring Boot..."
+                                  th:text="${existingDetails?.notes}"></textarea>
+                    </div>
+
+                    <!-- Preview -->
+                    <div class="bg-light rounded-3 p-3 mb-4">
+                        <small class="text-muted fw-600 d-block mb-2">INTERVIEW SUMMARY</small>
+                        <div class="d-flex flex-column gap-1 small">
+                            <div>
+                                <i class="bi bi-person me-2 text-muted"></i>
+                                <span th:text="${candidature.candidat.prenom + ' ' + candidature.candidat.nom}"></span>
+                            </div>
+                            <div>
+                                <i class="bi bi-briefcase me-2 text-muted"></i>
+                                <span th:text="${candidature.offre.titre}"></span>
+                            </div>
+                            <div>
+                                <i class="bi bi-building me-2 text-muted"></i>
+                                <span th:text="${candidature.offre.entreprise.nom}"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-3">
+                        <button type="submit" class="btn-primary-custom">
+                            <i class="bi bi-calendar-check me-2"></i>
+                            <span th:text="${existingDetails != null} ? 'Update Interview' : 'Schedule Interview'"></span>
+                        </button>
+                        <a th:href="@{/recruteur/offres/{id}/candidatures(id=${candidature.offre.id})}"
+                           class="btn-outline-custom">
+                            Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer class="footer-custom">
+    <div class="container"><p class="mb-0">© 2026 JobBoard</p></div>
+</footer>
+<th:block th:replace="~{layout/base :: scripts}"></th:block>
+</body>
+</html>

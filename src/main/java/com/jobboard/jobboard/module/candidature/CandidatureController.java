@@ -12,12 +12,18 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.jobboard.jobboard.module.candidature.InterviewDetails;
+import com.jobboard.jobboard.module.candidature.InterviewDetailsRepository;
+import java.util.List;
+import java.util.Map;
+
 @Controller
 @RequiredArgsConstructor
 public class CandidatureController {
 
     private final CandidatureService candidatureService;
     private final CandidatRepository candidatRepository;
+    private final InterviewDetailsRepository interviewDetailsRepository;
 
     @PostMapping("/candidatures")
     public String postuler(@RequestParam Long offreId,
@@ -36,26 +42,68 @@ public class CandidatureController {
         }
     }
 
-    @GetMapping("/candidat/candidatures")
-    public String historique(@AuthenticationPrincipal UserDetails userDetails, Model model) {
-        Candidat candidat = candidatRepository.findByEmail(userDetails.getUsername())
-                .orElseThrow(() -> new ResourceNotFoundException("Candidat introuvable."));
-        model.addAttribute("candidatures", candidatureService.findByCandidat(candidat.getId()));
-        return "candidat/historique";
-    }
+   
 
     @GetMapping("/recruteur/offres/{offreId}/candidatures")
     public String candidaturesParOffre(@PathVariable Long offreId, Model model) {
         model.addAttribute("candidatures", candidatureService.findByOffre(offreId));
         model.addAttribute("offreId", offreId);
+        model.addAttribute("statuts", StatutCandidature.values());
         return "recruteur/candidatures";
     }
 
-    @PostMapping("/recruteur/candidatures/{id}/traiter")
-    public String traiter(@PathVariable Long id,
+    @PostMapping("/recruteur/candidatures/{id}/statut")
+    public String changerStatut(@PathVariable Long id,
             @RequestParam StatutCandidature statut,
-            @RequestParam Long offreId) {
-        candidatureService.traiter(id, statut);
+            @RequestParam Long offreId,
+            RedirectAttributes redirectAttributes) {
+        try {
+            candidatureService.changerStatut(id, statut);
+            redirectAttributes.addFlashAttribute("success", "Status updated successfully.");
+        } catch (IllegalStateException e) {
+            redirectAttributes.addFlashAttribute("erreur", e.getMessage());
+        }
         return "redirect:/recruteur/offres/" + offreId + "/candidatures";
     }
+
+    @GetMapping("/recruteur/candidatures/{id}/interview")
+    public String interviewForm(@PathVariable Long id, Model model) {
+        Candidature candidature = candidatureService.findById(id);
+        model.addAttribute("candidature", candidature);
+        model.addAttribute("request", new InterviewRequest());
+        interviewDetailsRepository.findByCandidatureId(id)
+                .ifPresent(d -> model.addAttribute("existingDetails", d));
+        return "recruteur/interview-form";
+    }
+
+    @PostMapping("/recruteur/candidatures/{id}/interview")
+    public String scheduleInterview(@PathVariable Long id,
+            @ModelAttribute InterviewRequest request,
+            RedirectAttributes redirectAttributes) {
+        Candidature candidature = candidatureService.scheduleInterview(id, request);
+        redirectAttributes.addFlashAttribute("success", "Interview scheduled successfully.");
+        return "redirect:/recruteur/offres/" + candidature.getOffre().getId() + "/candidatures";
+    }
+
+    @GetMapping("/candidat/candidatures")
+    public String historique(@AuthenticationPrincipal UserDetails userDetails, Model model) {
+        Candidat candidat = candidatRepository.findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new ResourceNotFoundException("Candidat introuvable."));
+
+        List<Candidature> candidatures = candidatureService.findByCandidat(candidat.getId());
+
+        // Map candidatureId -> InterviewDetails
+        Map<Long, InterviewDetails> interviewMap = candidatures.stream()
+                .filter(c -> c.getStatut() == StatutCandidature.INTERVIEW_SCHEDULED
+                        || c.getStatut() == StatutCandidature.INTERVIEW_COMPLETED)
+                .collect(java.util.stream.Collectors.toMap(
+                        Candidature::getId,
+                        c -> interviewDetailsRepository.findByCandidatureId(c.getId()).orElse(null),
+                        (a, b) -> a));
+
+        model.addAttribute("candidatures", candidatures);
+        model.addAttribute("interviewMap", interviewMap);
+        return "candidat/historique";
+    }
+
 }

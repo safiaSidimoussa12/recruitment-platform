@@ -1,5 +1,12 @@
 package com.jobboard.jobboard.shared.domain;
 
 public enum StatutCandidature {
-    EN_ATTENTE, ACCEPTEE, REFUSEE
+    APPLIED,
+    REVIEWED,
+    SHORTLISTED,
+    INTERVIEW_SCHEDULED,
+    INTERVIEW_COMPLETED,
+    OFFER_SENT,
+    HIRED,
+    REJECTED
 }

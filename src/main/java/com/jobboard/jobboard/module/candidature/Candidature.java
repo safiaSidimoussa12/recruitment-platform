@@ -26,7 +26,7 @@ public class Candidature {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private StatutCandidature statut = StatutCandidature.EN_ATTENTE;
+    private StatutCandidature statut = StatutCandidature.APPLIED;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime dateSoumission = LocalDateTime.now();
