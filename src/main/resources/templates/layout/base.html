@@ -43,6 +43,7 @@
             font-weight: 800;
             color: white !important;
             letter-spacing: -0.5px;
+            text-decoration: none;
         }
 
         .navbar-brand-custom span {
@@ -58,6 +59,7 @@
             padding: 6px 14px !important;
             border-radius: 8px;
             transition: all 0.2s;
+            text-decoration: none;
         }
 
         .nav-link-custom:hover {
@@ -73,11 +75,40 @@
             border-radius: 8px;
             font-weight: 500;
             transition: all 0.2s;
+            cursor: pointer;
         }
 
         .btn-nav-logout:hover {
             background: rgba(255,255,255,0.35);
             color: white;
+        }
+
+        /* Dropdown */
+        .dropdown-menu {
+            background: white;
+            min-width: 210px;
+            border: none;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+            border-radius: 12px;
+            padding: 8px;
+        }
+
+        .dropdown-item {
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--dark);
+            transition: all 0.15s;
+        }
+
+        .dropdown-item:hover {
+            background: var(--gradient-soft);
+            color: var(--primary);
+        }
+
+        .dropdown-toggle::after {
+            margin-left: 4px;
         }
 
         /* ── Cards ── */
@@ -150,6 +181,8 @@
             font-weight: 600;
             transition: all 0.2s;
             box-shadow: 0 4px 15px rgba(99,102,241,0.3);
+            text-decoration: none;
+            display: inline-block;
         }
 
         .btn-primary-custom:hover {
@@ -166,6 +199,8 @@
             font-weight: 600;
             background: transparent;
             transition: all 0.2s;
+            text-decoration: none;
+            display: inline-block;
         }
 
         .btn-outline-custom:hover {
@@ -331,17 +366,19 @@
 <nav th:fragment="navbar" class="navbar navbar-expand-lg navbar-jobboard">
     <div class="container">
         <a class="navbar-brand-custom"
-   th:href="${#authorization.expression('hasRole(''RECRUTEUR'')')} ? '/recruteur/dashboard' :
-            (${#authorization.expression('hasRole(''ADMIN'')')} ? '/admin/dashboard' : '/offres')">
-    Job<span>Board</span>
-</a>
-        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse"
-                data-bs-target="#navbarNav" style="color:white">
+           th:href="${#authorization.expression('hasRole(''RECRUTEUR'')')} ? '/recruteur/dashboard' :
+                    (${#authorization.expression('hasRole(''ADMIN'')')} ? '/admin/dashboard' : '/offres')">
+            Job<span>Board</span>
+        </a>
+        <button class="navbar-toggler border-0" type="button"
+                data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                style="color:white">
             <i class="bi bi-list fs-4"></i>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto align-items-center gap-1">
 
+                <!-- Anonymous -->
                 <li class="nav-item" sec:authorize="isAnonymous()">
                     <a class="nav-link-custom" th:href="@{/offres}">
                         <i class="bi bi-briefcase me-1"></i>Jobs
@@ -354,6 +391,7 @@
                     <a class="nav-link-custom" th:href="@{/register}">Register</a>
                 </li>
 
+                <!-- Candidat -->
                 <li class="nav-item" sec:authorize="hasRole('CANDIDAT')">
                     <a class="nav-link-custom" th:href="@{/offres}">
                         <i class="bi bi-briefcase me-1"></i>Jobs
@@ -375,10 +413,54 @@
                     </a>
                 </li>
 
+                <!-- Recruteur -->
+                <li class="nav-item" sec:authorize="hasRole('RECRUTEUR')">
+                    <a class="nav-link-custom" th:href="@{/recruteur/dashboard}">
+                        <i class="bi bi-speedometer2 me-1"></i>Dashboard
+                    </a>
+                </li>
                 <li class="nav-item" sec:authorize="hasRole('RECRUTEUR')">
                     <a class="nav-link-custom" th:href="@{/recruteur/offres}">
                         <i class="bi bi-briefcase me-1"></i>My Jobs
                     </a>
+                </li>
+                <li class="nav-item dropdown" sec:authorize="hasRole('RECRUTEUR')">
+                    <a class="nav-link-custom dropdown-toggle" href="#"
+                       data-bs-toggle="dropdown">
+                        <i class="bi bi-people me-1"></i>Pipeline
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a class="dropdown-item" th:href="@{/recruteur/offres}">
+                                <i class="bi bi-inbox me-2" style="color:var(--primary)"></i>
+                                All Applications
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" th:href="@{/recruteur/pipeline/shortlisted}">
+                                <i class="bi bi-star me-2" style="color:#d97706"></i>
+                                Shortlisted
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" th:href="@{/recruteur/pipeline/interviews}">
+                                <i class="bi bi-calendar-event me-2" style="color:#059669"></i>
+                                Interviews
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" th:href="@{/recruteur/pipeline/hired}">
+                                <i class="bi bi-check-circle me-2" style="color:#065f46"></i>
+                                Hired
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" th:href="@{/recruteur/pipeline/rejected}">
+                                <i class="bi bi-x-circle me-2" style="color:#dc2626"></i>
+                                Rejected
+                            </a>
+                        </li>
+                    </ul>
                 </li>
                 <li class="nav-item" sec:authorize="hasRole('RECRUTEUR')">
                     <a class="nav-link-custom" th:href="@{/recruteur/profil}">
@@ -386,6 +468,7 @@
                     </a>
                 </li>
 
+                <!-- Admin -->
                 <li class="nav-item" sec:authorize="hasRole('ADMIN')">
                     <a class="nav-link-custom" th:href="@{/admin/dashboard}">
                         <i class="bi bi-speedometer2 me-1"></i>Dashboard
@@ -394,7 +477,11 @@
                 <li class="nav-item" sec:authorize="hasRole('ADMIN')">
                     <a class="nav-link-custom" th:href="@{/admin/utilisateurs}">Users</a>
                 </li>
+                <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+                    <a class="nav-link-custom" th:href="@{/admin/entreprises}">Companies</a>
+                </li>
 
+                <!-- Logout -->
                 <li class="nav-item ms-2" sec:authorize="isAuthenticated()">
                     <form th:action="@{/logout}" method="post">
                         <button type="submit" class="btn-nav-logout">

@@ -2,6 +2,8 @@ package com.jobboard.jobboard.module.candidature;
 
 import com.jobboard.jobboard.module.candidat.Candidat;
 import com.jobboard.jobboard.module.candidat.CandidatRepository;
+import com.jobboard.jobboard.module.recruteur.Recruteur;
+import com.jobboard.jobboard.module.recruteur.RecruteurRepository;
 import com.jobboard.jobboard.shared.domain.StatutCandidature;
 import com.jobboard.jobboard.shared.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +26,7 @@ public class CandidatureController {
     private final CandidatureService candidatureService;
     private final CandidatRepository candidatRepository;
     private final InterviewDetailsRepository interviewDetailsRepository;
+    private final RecruteurRepository recruteurRepository;
 
     @PostMapping("/candidatures")
     public String postuler(@RequestParam Long offreId,
@@ -41,8 +44,6 @@ public class CandidatureController {
             return "redirect:/offres/" + offreId;
         }
     }
-
-   
 
     @GetMapping("/recruteur/offres/{offreId}/candidatures")
     public String candidaturesParOffre(@PathVariable Long offreId, Model model) {
@@ -104,6 +105,55 @@ public class CandidatureController {
         model.addAttribute("candidatures", candidatures);
         model.addAttribute("interviewMap", interviewMap);
         return "candidat/historique";
+    }
+
+    @GetMapping("/recruteur/pipeline/shortlisted")
+    public String shortlisted(@AuthenticationPrincipal UserDetails userDetails, Model model) {
+        Recruteur recruteur = getRecruteur(userDetails);
+        model.addAttribute("candidatures",
+                candidatureService.findByRecruteurAndStatut(recruteur.getId(), StatutCandidature.SHORTLISTED));
+        model.addAttribute("pageTitle", "Shortlisted Candidates");
+        model.addAttribute("statut", "SHORTLISTED");
+        return "recruteur/pipeline";
+    }
+
+    @GetMapping("/recruteur/pipeline/interviews")
+    public String interviews(@AuthenticationPrincipal UserDetails userDetails, Model model) {
+        Recruteur recruteur = getRecruteur(userDetails);
+        List<Candidature> scheduled = candidatureService
+                .findByRecruteurAndStatut(recruteur.getId(), StatutCandidature.INTERVIEW_SCHEDULED);
+        List<Candidature> completed = candidatureService
+                .findByRecruteurAndStatut(recruteur.getId(), StatutCandidature.INTERVIEW_COMPLETED);
+        scheduled.addAll(completed);
+        model.addAttribute("candidatures", scheduled);
+        model.addAttribute("pageTitle", "Interviews");
+        model.addAttribute("statut", "INTERVIEWS");
+        return "recruteur/pipeline";
+    }
+
+    @GetMapping("/recruteur/pipeline/hired")
+    public String hired(@AuthenticationPrincipal UserDetails userDetails, Model model) {
+        Recruteur recruteur = getRecruteur(userDetails);
+        model.addAttribute("candidatures",
+                candidatureService.findByRecruteurAndStatut(recruteur.getId(), StatutCandidature.HIRED));
+        model.addAttribute("pageTitle", "Hired Candidates");
+        model.addAttribute("statut", "HIRED");
+        return "recruteur/pipeline";
+    }
+
+    @GetMapping("/recruteur/pipeline/rejected")
+    public String rejected(@AuthenticationPrincipal UserDetails userDetails, Model model) {
+        Recruteur recruteur = getRecruteur(userDetails);
+        model.addAttribute("candidatures",
+                candidatureService.findByRecruteurAndStatut(recruteur.getId(), StatutCandidature.REJECTED));
+        model.addAttribute("pageTitle", "Rejected Candidates");
+        model.addAttribute("statut", "REJECTED");
+        return "recruteur/pipeline";
+    }
+
+    private Recruteur getRecruteur(UserDetails userDetails) {
+        return recruteurRepository.findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new ResourceNotFoundException("Recruiter not found."));
     }
 
 }

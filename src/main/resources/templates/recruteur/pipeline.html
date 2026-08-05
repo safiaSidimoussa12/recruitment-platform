@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/base :: head('Pipeline')}"></head>
+<body>
+<nav th:replace="~{layout/base :: navbar}"></nav>
+
+<div class="page-header">
+    <div class="container d-flex justify-content-between align-items-center">
+        <div>
+            <h1 th:text="${pageTitle}">Pipeline</h1>
+            <p class="text-muted mb-0"
+               th:text="${candidatures.size()} + ' candidates'"></p>
+        </div>
+        <a th:href="@{/recruteur/dashboard}" class="btn-outline-custom">
+            ← Dashboard
+        </a>
+    </div>
+</div>
+
+<!-- Pipeline tabs -->
+<div class="container">
+    <div class="d-flex gap-2 mb-4 flex-wrap">
+        <a th:href="@{/recruteur/offres}"
+           class="btn btn-sm border rounded-3"
+           style="color:var(--primary);border-color:#c7d2fe">
+            <i class="bi bi-inbox me-1"></i>All Applications
+        </a>
+        <a th:href="@{/recruteur/pipeline/shortlisted}"
+           class="btn btn-sm border rounded-3"
+           th:classappend="${statut == 'SHORTLISTED'} ? ' text-white' : ''"
+           th:style="${statut == 'SHORTLISTED'} ? 'background:var(--gradient);border-color:transparent' : 'color:#d97706;border-color:#fde68a'">
+            <i class="bi bi-star me-1"></i>Shortlisted
+        </a>
+        <a th:href="@{/recruteur/pipeline/interviews}"
+           class="btn btn-sm border rounded-3"
+           th:classappend="${statut == 'INTERVIEWS'} ? ' text-white' : ''"
+           th:style="${statut == 'INTERVIEWS'} ? 'background:var(--gradient);border-color:transparent' : 'color:#059669;border-color:#a7f3d0'">
+            <i class="bi bi-calendar-event me-1"></i>Interviews
+        </a>
+        <a th:href="@{/recruteur/pipeline/hired}"
+           class="btn btn-sm border rounded-3"
+           th:classappend="${statut == 'HIRED'} ? ' text-white' : ''"
+           th:style="${statut == 'HIRED'} ? 'background:var(--gradient);border-color:transparent' : 'color:#065f46;border-color:#6ee7b7'">
+            <i class="bi bi-check-circle me-1"></i>Hired
+        </a>
+        <a th:href="@{/recruteur/pipeline/rejected}"
+           class="btn btn-sm border rounded-3"
+           th:classappend="${statut == 'REJECTED'} ? ' text-white' : ''"
+           th:style="${statut == 'REJECTED'} ? 'background:var(--gradient);border-color:transparent' : 'color:#dc2626;border-color:#fecaca'">
+            <i class="bi bi-x-circle me-1"></i>Rejected
+        </a>
+    </div>
+</div>
+
+<div class="container mb-5">
+
+    <div th:if="${candidatures.isEmpty()}" class="text-center py-5">
+        <i class="bi bi-inbox fs-1 text-muted d-block mb-3"></i>
+        <h5 class="text-muted">No candidates at this stage</h5>
+    </div>
+
+    <div class="row g-3" th:unless="${candidatures.isEmpty()}">
+        <div class="col-12" th:each="c : ${candidatures}">
+            <div class="card-modern card p-4">
+                <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+
+                    <!-- Candidate info -->
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center"
+                             style="width:48px;height:48px;background:var(--gradient);color:white;font-weight:700;font-size:1.1rem"
+                             th:text="${#strings.substring(c.candidat.prenom,0,1) + #strings.substring(c.candidat.nom,0,1)}">
+                        </div>
+                        <div>
+                            <h6 class="fw-bold mb-0"
+                                th:text="${c.candidat.prenom + ' ' + c.candidat.nom}"></h6>
+                            <small class="text-muted" th:text="${c.candidat.email}"></small>
+                            <div class="mt-1">
+                                <small class="text-muted">
+                                    <i class="bi bi-briefcase me-1"></i>
+                                    <span th:text="${c.offre.titre}"></span>
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Status + date -->
+                    <div class="d-flex flex-column align-items-end gap-2">
+                        <span th:switch="${c.statut.name()}">
+                            <span th:case="'SHORTLISTED'" class="badge rounded-pill"
+                                  style="background:#dbeafe;color:#2563eb;padding:6px 14px">
+                                ⭐ Shortlisted
+                            </span>
+                            <span th:case="'INTERVIEW_SCHEDULED'" class="badge rounded-pill"
+                                  style="background:#d1fae5;color:#059669;padding:6px 14px">
+                                📅 Interview Scheduled
+                            </span>
+                            <span th:case="'INTERVIEW_COMPLETED'" class="badge rounded-pill"
+                                  style="background:#ede9fe;color:#7c3aed;padding:6px 14px">
+                                ✅ Interview Done
+                            </span>
+                            <span th:case="'HIRED'" class="badge rounded-pill"
+                                  style="background:#d1fae5;color:#065f46;padding:6px 14px;font-weight:700">
+                                🎉 Hired
+                            </span>
+                            <span th:case="'REJECTED'" class="badge rounded-pill"
+                                  style="background:#fee2e2;color:#dc2626;padding:6px 14px">
+                                ❌ Rejected
+                            </span>
+                        </span>
+                        <small class="text-muted">
+                            Applied
+                            <span th:text="${#temporals.format(c.dateSoumission,'dd MMM yyyy')}"></span>
+                        </small>
+                    </div>
+                </div>
+
+                <!-- CV -->
+                <div class="d-flex gap-2 mt-3">
+                    <a th:if="${c.candidat.cv != null}"
+                       th:href="@{/candidat/cv/download/{id}(id=${c.candidat.id})}"
+                       target="_blank" class="btn btn-sm border"
+                       style="border-radius:8px;color:#6366f1;border-color:#c7d2fe;font-size:0.8rem">
+                        <i class="bi bi-file-earmark-pdf me-1"></i>View CV
+                    </a>
+
+                    <!-- Schedule Interview if shortlisted -->
+                    <a th:if="${c.statut.name() == 'SHORTLISTED'}"
+                       th:href="@{/recruteur/candidatures/{id}/interview(id=${c.id})}"
+                       class="btn btn-sm border"
+                       style="border-radius:8px;color:#059669;border-color:#a7f3d0;font-size:0.8rem">
+                        📅 Schedule Interview
+                    </a>
+
+                    <!-- Hire if interview completed -->
+                    <form th:if="${c.statut.name() == 'INTERVIEW_COMPLETED'}"
+                          th:action="@{/recruteur/candidatures/{id}/statut(id=${c.id})}"
+                          method="post">
+                        <input type="hidden" name="offreId" th:value="${c.offre.id}"/>
+                        <input type="hidden" name="statut" value="HIRED"/>
+                        <button type="submit" class="btn btn-sm"
+                                style="border-radius:8px;background:#d1fae5;color:#065f46;font-size:0.8rem;border:1px solid #6ee7b7">
+                            🎉 Hire
+                        </button>
+                    </form>
+
+                    <!-- Message -->
+                    <a th:href="@{/messages/{id}(id=${c.id})}"
+                       class="btn-outline-custom"
+                       style="padding:6px 14px;font-size:0.8rem">
+                        <i class="bi bi-chat me-1"></i>Message
+                    </a>
+
+                    <!-- View full application -->
+                    <a th:href="@{/recruteur/offres/{id}/candidatures(id=${c.offre.id})}"
+                       class="btn btn-sm border"
+                       style="border-radius:8px;color:var(--muted);font-size:0.8rem">
+                        <i class="bi bi-eye me-1"></i>Full Application
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer class="footer-custom">
+    <div class="container"><p class="mb-0">© 2026 JobBoard</p></div>
+</footer>
+<th:block th:replace="~{layout/base :: scripts}"></th:block>
+</body>
+</html>

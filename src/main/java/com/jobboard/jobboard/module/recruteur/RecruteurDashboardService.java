@@ -4,6 +4,7 @@ import com.jobboard.jobboard.module.candidature.CandidatureRepository;
 import com.jobboard.jobboard.module.messagerie.MessageRepository;
 import com.jobboard.jobboard.module.offre.Offre;
 import com.jobboard.jobboard.module.offre.OffreRepository;
+import com.jobboard.jobboard.shared.domain.StatutCandidature;
 import com.jobboard.jobboard.shared.domain.StatutOffre;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -42,5 +43,19 @@ public class RecruteurDashboardService {
                 .sorted((a, b) -> b.getDatePublication().compareTo(a.getDatePublication()))
                 .limit(5)
                 .toList();
+    }
+
+    public long countShortlisted(Long recruteurId) {
+        return offreRepository.findByRecruteurId(recruteurId).stream()
+                .mapToLong(o -> candidatureRepository
+                        .findByOffreIdAndStatut(o.getId(), StatutCandidature.SHORTLISTED).size())
+                .sum();
+    }
+
+    public long countHired(Long recruteurId) {
+        return offreRepository.findByRecruteurId(recruteurId).stream()
+                .mapToLong(o -> candidatureRepository
+                        .findByOffreIdAndStatut(o.getId(), StatutCandidature.HIRED).size())
+                .sum();
     }
 }

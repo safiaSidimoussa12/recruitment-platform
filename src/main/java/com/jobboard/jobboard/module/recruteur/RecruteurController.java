@@ -46,6 +46,9 @@ public class RecruteurController {
         model.addAttribute("totalCandidatures", dashboardService.countCandidaturesRecues(recruteur.getId()));
         model.addAttribute("messagesNonLus", dashboardService.countMessagesNonLus(recruteur.getId()));
         model.addAttribute("recentOffres", dashboardService.getRecentOffres(recruteur.getId()));
+
+        model.addAttribute("totalShortlisted", dashboardService.countShortlisted(recruteur.getId()));
+        model.addAttribute("totalHired", dashboardService.countHired(recruteur.getId()));
         return "recruteur/dashboard";
     }
 
