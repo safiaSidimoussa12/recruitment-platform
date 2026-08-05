@@ -155,28 +155,16 @@
                             </button>
                         </form>
 
-                        <!-- Send Offer -->
-                        <form th:if="${c.statut.name() == 'INTERVIEW_COMPLETED'}"
-                              th:action="@{/recruteur/candidatures/{id}/statut(id=${c.id})}"
-                              method="post">
-                            <input type="hidden" name="offreId" th:value="${offreId}"/>
-                            <input type="hidden" name="statut" value="OFFER_SENT"/>
-                            <button type="submit" class="btn-primary-custom"
-                                    style="padding:6px 14px;font-size:0.8rem">
-                                📨 Send Offer
-                            </button>
-                        </form>
-
-                        <!-- Hire -->
-                        <form th:if="${c.statut.name() == 'OFFER_SENT'}"
-                              th:action="@{/recruteur/candidatures/{id}/statut(id=${c.id})}"
-                              method="post">
-                            <input type="hidden" name="offreId" th:value="${offreId}"/>
-                            <input type="hidden" name="statut" value="HIRED"/>
-                            <button type="submit" class="btn btn-sm"
-                                    style="border-radius:8px;background:#d1fae5;color:#065f46;font-size:0.8rem;border:1px solid #6ee7b7">
-                                🎉 Mark as Hired
-                            </button>
+                       <!-- Hire or Reject after interview -->
+                       <form th:if="${c.statut.name() == 'INTERVIEW_COMPLETED'}"
+                                         th:action="@{/recruteur/candidatures/{id}/statut(id=${c.id})}"
+                                             method="post">
+                                  <input type="hidden" name="offreId" th:value="${offreId}"/>
+                                  <input type="hidden" name="statut" value="HIRED"/>
+                                     <button type="submit" class="btn btn-sm"
+                                      style="border-radius:8px;background:#d1fae5;color:#065f46;font-size:0.8rem;border:1px solid #6ee7b7">
+                                           🎉 Hire
+                                  </button>
                         </form>
 
                         <!-- Reject (always visible) -->
