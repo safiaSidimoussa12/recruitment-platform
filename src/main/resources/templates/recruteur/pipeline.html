@@ -28,25 +28,33 @@
         <a th:href="@{/recruteur/pipeline/shortlisted}"
            class="btn btn-sm border rounded-3"
            th:classappend="${statut == 'SHORTLISTED'} ? ' text-white' : ''"
-           th:style="${statut == 'SHORTLISTED'} ? 'background:var(--gradient);border-color:transparent' : 'color:#d97706;border-color:#fde68a'">
+           th:style="${statut == 'SHORTLISTED'} ?
+               'background:var(--gradient);border-color:transparent' :
+               'color:#d97706;border-color:#fde68a'">
             <i class="bi bi-star me-1"></i>Shortlisted
         </a>
         <a th:href="@{/recruteur/pipeline/interviews}"
            class="btn btn-sm border rounded-3"
            th:classappend="${statut == 'INTERVIEWS'} ? ' text-white' : ''"
-           th:style="${statut == 'INTERVIEWS'} ? 'background:var(--gradient);border-color:transparent' : 'color:#059669;border-color:#a7f3d0'">
+           th:style="${statut == 'INTERVIEWS'} ?
+               'background:var(--gradient);border-color:transparent' :
+               'color:#059669;border-color:#a7f3d0'">
             <i class="bi bi-calendar-event me-1"></i>Interviews
         </a>
         <a th:href="@{/recruteur/pipeline/hired}"
            class="btn btn-sm border rounded-3"
            th:classappend="${statut == 'HIRED'} ? ' text-white' : ''"
-           th:style="${statut == 'HIRED'} ? 'background:var(--gradient);border-color:transparent' : 'color:#065f46;border-color:#6ee7b7'">
+           th:style="${statut == 'HIRED'} ?
+               'background:var(--gradient);border-color:transparent' :
+               'color:#065f46;border-color:#6ee7b7'">
             <i class="bi bi-check-circle me-1"></i>Hired
         </a>
         <a th:href="@{/recruteur/pipeline/rejected}"
            class="btn btn-sm border rounded-3"
            th:classappend="${statut == 'REJECTED'} ? ' text-white' : ''"
-           th:style="${statut == 'REJECTED'} ? 'background:var(--gradient);border-color:transparent' : 'color:#dc2626;border-color:#fecaca'">
+           th:style="${statut == 'REJECTED'} ?
+               'background:var(--gradient);border-color:transparent' :
+               'color:#dc2626;border-color:#fecaca'">
             <i class="bi bi-x-circle me-1"></i>Rejected
         </a>
     </div>
@@ -62,6 +70,8 @@
     <div class="row g-3" th:unless="${candidatures.isEmpty()}">
         <div class="col-12" th:each="c : ${candidatures}">
             <div class="card-modern card p-4">
+
+                <!-- Header -->
                 <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
 
                     <!-- Candidate info -->
@@ -73,7 +83,8 @@
                         <div>
                             <h6 class="fw-bold mb-0"
                                 th:text="${c.candidat.prenom + ' ' + c.candidat.nom}"></h6>
-                            <small class="text-muted" th:text="${c.candidat.email}"></small>
+                            <small class="text-muted"
+                                   th:text="${c.candidat.email}"></small>
                             <div class="mt-1">
                                 <small class="text-muted">
                                     <i class="bi bi-briefcase me-1"></i>
@@ -114,14 +125,20 @@
                     </div>
                 </div>
 
-                <!-- CV -->
-                <div class="d-flex gap-2 mt-3">
+                <!-- Action buttons -->
+                <div class="d-flex gap-2 mt-3 flex-wrap">
+
+                    <!-- View CV -->
                     <a th:if="${c.candidat.cv != null}"
                        th:href="@{/candidat/cv/download/{id}(id=${c.candidat.id})}"
                        target="_blank" class="btn btn-sm border"
                        style="border-radius:8px;color:#6366f1;border-color:#c7d2fe;font-size:0.8rem">
                         <i class="bi bi-file-earmark-pdf me-1"></i>View CV
                     </a>
+                    <span th:unless="${c.candidat.cv != null}"
+                          class="text-muted small align-self-center">
+                        <i class="bi bi-file-earmark-x me-1"></i>No CV
+                    </span>
 
                     <!-- Schedule Interview if shortlisted -->
                     <a th:if="${c.statut.name() == 'SHORTLISTED'}"
@@ -130,6 +147,18 @@
                        style="border-radius:8px;color:#059669;border-color:#a7f3d0;font-size:0.8rem">
                         📅 Schedule Interview
                     </a>
+
+                    <!-- Mark Interview Done if interview scheduled -->
+                    <form th:if="${c.statut.name() == 'INTERVIEW_SCHEDULED'}"
+                          th:action="@{/recruteur/candidatures/{id}/statut(id=${c.id})}"
+                          method="post">
+                        <input type="hidden" name="offreId" th:value="${c.offre.id}"/>
+                        <input type="hidden" name="statut" value="INTERVIEW_COMPLETED"/>
+                        <button type="submit" class="btn btn-sm border"
+                                style="border-radius:8px;color:#7c3aed;border-color:#ddd6fe;font-size:0.8rem">
+                            ✅ Mark Interview Done
+                        </button>
+                    </form>
 
                     <!-- Hire if interview completed -->
                     <form th:if="${c.statut.name() == 'INTERVIEW_COMPLETED'}"
@@ -140,6 +169,18 @@
                         <button type="submit" class="btn btn-sm"
                                 style="border-radius:8px;background:#d1fae5;color:#065f46;font-size:0.8rem;border:1px solid #6ee7b7">
                             🎉 Hire
+                        </button>
+                    </form>
+
+                    <!-- Reject always visible except hired/rejected -->
+                    <form th:if="${c.statut.name() != 'HIRED' and c.statut.name() != 'REJECTED'}"
+                          th:action="@{/recruteur/candidatures/{id}/statut(id=${c.id})}"
+                          method="post">
+                        <input type="hidden" name="offreId" th:value="${c.offre.id}"/>
+                        <input type="hidden" name="statut" value="REJECTED"/>
+                        <button type="submit" class="btn btn-sm border"
+                                style="border-radius:8px;color:#ef4444;border-color:#fecaca;font-size:0.8rem">
+                            ❌ Reject
                         </button>
                     </form>
 
@@ -157,6 +198,7 @@
                         <i class="bi bi-eye me-1"></i>Full Application
                     </a>
                 </div>
+
             </div>
         </div>
     </div>

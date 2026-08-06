@@ -27,6 +27,7 @@ public class CandidatureController {
     private final CandidatRepository candidatRepository;
     private final InterviewDetailsRepository interviewDetailsRepository;
     private final RecruteurRepository recruteurRepository;
+    private final com.jobboard.jobboard.module.offre.OffreService offreService;
 
     @PostMapping("/candidatures")
     public String postuler(@RequestParam Long offreId,
@@ -46,11 +47,53 @@ public class CandidatureController {
     }
 
     @GetMapping("/recruteur/offres/{offreId}/candidatures")
-    public String candidaturesParOffre(@PathVariable Long offreId, Model model) {
-        model.addAttribute("candidatures", candidatureService.findByOffre(offreId));
+    public String candidaturesParOffre(@PathVariable Long offreId,
+            @RequestParam(defaultValue = "ALL") String statut,
+            Model model) {
+        List<Candidature> candidatures;
+
+        if ("ALL".equals(statut)) {
+            candidatures = candidatureService.findByOffre(offreId);
+        } else {
+            StatutCandidature s = StatutCandidature.valueOf(statut);
+            candidatures = candidatureService.findByOffreAndStatut(offreId, s);
+        }
+
+        // Compter par statut pour les tabs
+        Map<String, Long> counts = new java.util.LinkedHashMap<>();
+        counts.put("ALL", (long) candidatureService.findByOffre(offreId).size());
+        counts.put("APPLIED", countByStatut(offreId, StatutCandidature.APPLIED));
+        counts.put("SHORTLISTED", countByStatut(offreId, StatutCandidature.SHORTLISTED));
+        counts.put("INTERVIEWS", countByStatutList(offreId,
+                List.of(StatutCandidature.INTERVIEW_SCHEDULED, StatutCandidature.INTERVIEW_COMPLETED)));
+        counts.put("HIRED", countByStatut(offreId, StatutCandidature.HIRED));
+        counts.put("REJECTED", countByStatut(offreId, StatutCandidature.REJECTED));
+
+        // Pour INTERVIEWS, combiner scheduled + completed
+        if ("INTERVIEWS".equals(statut)) {
+            candidatures = new java.util.ArrayList<>();
+            candidatures.addAll(candidatureService.findByOffreAndStatut(
+                    offreId, StatutCandidature.INTERVIEW_SCHEDULED));
+            candidatures.addAll(candidatureService.findByOffreAndStatut(
+                    offreId, StatutCandidature.INTERVIEW_COMPLETED));
+        }
+
+        model.addAttribute("candidatures", candidatures);
         model.addAttribute("offreId", offreId);
-        model.addAttribute("statuts", StatutCandidature.values());
+        model.addAttribute("statut", statut);
+        model.addAttribute("counts", counts);
+        model.addAttribute("offre", offreService.findById(offreId));
         return "recruteur/candidatures";
+    }
+
+    private long countByStatut(Long offreId, StatutCandidature statut) {
+        return candidatureService.findByOffreAndStatut(offreId, statut).size();
+    }
+
+    private long countByStatutList(Long offreId, List<StatutCandidature> statuts) {
+        return statuts.stream()
+                .mapToLong(s -> candidatureService.findByOffreAndStatut(offreId, s).size())
+                .sum();
     }
 
     @PostMapping("/recruteur/candidatures/{id}/statut")
@@ -120,12 +163,14 @@ public class CandidatureController {
     @GetMapping("/recruteur/pipeline/interviews")
     public String interviews(@AuthenticationPrincipal UserDetails userDetails, Model model) {
         Recruteur recruteur = getRecruteur(userDetails);
-        List<Candidature> scheduled = candidatureService
-                .findByRecruteurAndStatut(recruteur.getId(), StatutCandidature.INTERVIEW_SCHEDULED);
-        List<Candidature> completed = candidatureService
-                .findByRecruteurAndStatut(recruteur.getId(), StatutCandidature.INTERVIEW_COMPLETED);
-        scheduled.addAll(completed);
-        model.addAttribute("candidatures", scheduled);
+
+        List<Candidature> result = new java.util.ArrayList<>();
+        result.addAll(candidatureService.findByRecruteurAndStatut(
+                recruteur.getId(), StatutCandidature.INTERVIEW_SCHEDULED));
+        result.addAll(candidatureService.findByRecruteurAndStatut(
+                recruteur.getId(), StatutCandidature.INTERVIEW_COMPLETED));
+
+        model.addAttribute("candidatures", result);
         model.addAttribute("pageTitle", "Interviews");
         model.addAttribute("statut", "INTERVIEWS");
         return "recruteur/pipeline";

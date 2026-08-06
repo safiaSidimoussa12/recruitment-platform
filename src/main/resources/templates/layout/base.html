@@ -424,44 +424,11 @@
                         <i class="bi bi-briefcase me-1"></i>My Jobs
                     </a>
                 </li>
-                <li class="nav-item dropdown" sec:authorize="hasRole('RECRUTEUR')">
-                    <a class="nav-link-custom dropdown-toggle" href="#"
-                       data-bs-toggle="dropdown">
-                        <i class="bi bi-people me-1"></i>Pipeline
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li>
-                            <a class="dropdown-item" th:href="@{/recruteur/offres}">
-                                <i class="bi bi-inbox me-2" style="color:var(--primary)"></i>
-                                All Applications
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item" th:href="@{/recruteur/pipeline/shortlisted}">
-                                <i class="bi bi-star me-2" style="color:#d97706"></i>
-                                Shortlisted
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item" th:href="@{/recruteur/pipeline/interviews}">
-                                <i class="bi bi-calendar-event me-2" style="color:#059669"></i>
-                                Interviews
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item" th:href="@{/recruteur/pipeline/hired}">
-                                <i class="bi bi-check-circle me-2" style="color:#065f46"></i>
-                                Hired
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item" th:href="@{/recruteur/pipeline/rejected}">
-                                <i class="bi bi-x-circle me-2" style="color:#dc2626"></i>
-                                Rejected
-                            </a>
-                        </li>
-                    </ul>
-                </li>
+            <li class="nav-item" sec:authorize="hasRole('RECRUTEUR')">
+    <a class="nav-link-custom" th:href="@{/recruteur/offres}">
+        <i class="bi bi-people me-1"></i>Applications
+    </a>
+</li>
                 <li class="nav-item" sec:authorize="hasRole('RECRUTEUR')">
                     <a class="nav-link-custom" th:href="@{/recruteur/profil}">
                         <i class="bi bi-person me-1"></i>Profile

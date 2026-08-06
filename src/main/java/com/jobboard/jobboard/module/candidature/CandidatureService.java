@@ -85,21 +85,21 @@ public class CandidatureService {
                 .orElseThrow(() -> new ResourceNotFoundException("Candidature introuvable."));
     }
 
-
     public List<Candidature> findByOffreAndStatut(Long offreId, StatutCandidature statut) {
-    return candidatureRepository.findByOffreIdAndStatut(offreId, statut);
-}
+        return candidatureRepository.findByOffreIdAndStatut(offreId, statut);
+    }
 
-public List<Candidature> findByRecruteurAndStatut(Long recruteurId, StatutCandidature statut) {
-    return candidatureRepository.findAll().stream()
-        .filter(c -> c.getOffre().getRecruteur().getId().equals(recruteurId)
-                  && c.getStatut() == statut)
-        .toList();
-}
+    public List<Candidature> findByRecruteurAndStatut(Long recruteurId, StatutCandidature statut) {
+        return candidatureRepository.findAll().stream()
+                .filter(c -> c.getOffre().getRecruteur().getId().equals(recruteurId)
+                        && c.getStatut() == statut)
+                .toList();
+    }
 
-public List<Candidature> findByRecruteur(Long recruteurId) {
-    return candidatureRepository.findAll().stream()
-        .filter(c -> c.getOffre().getRecruteur().getId().equals(recruteurId))
-        .toList();
-}
+    public List<Candidature> findByRecruteur(Long recruteurId) {
+        return candidatureRepository.findAll().stream()
+                .filter(c -> c.getOffre().getRecruteur().getId().equals(recruteurId))
+                .toList();
+    }
+
 }
