@@ -72,4 +72,36 @@ public class OffreService {
                     offreRepository.save(o);
                 });
     }
+
+
+    @Transactional
+public void archiver(Long id) {
+    Offre offre = findById(id);
+    offre.setStatut(StatutOffre.SUPPRIMEE);
+    offreRepository.save(offre);
+}
+
+@Transactional
+public void restaurer(Long id) {
+    Offre offre = findById(id);
+    offre.setStatut(StatutOffre.PUBLIEE);
+    offreRepository.save(offre);
+}
+
+@Transactional
+public void supprimerDefinitivement(Long id) {
+    offreRepository.deleteById(id);
+}
+
+public List<Offre> findArchivedByRecruteur(Long recruteurId) {
+    return offreRepository.findByRecruteurId(recruteurId).stream()
+        .filter(o -> o.getStatut() == StatutOffre.SUPPRIMEE)
+        .toList();
+}
+
+public List<Offre> findActiveByRecruteur(Long recruteurId) {
+    return offreRepository.findByRecruteurId(recruteurId).stream()
+        .filter(o -> o.getStatut() != StatutOffre.SUPPRIMEE)
+        .toList();
+}
 }

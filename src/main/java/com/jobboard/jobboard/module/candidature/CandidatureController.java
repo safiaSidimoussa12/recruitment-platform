@@ -54,29 +54,27 @@ public class CandidatureController {
 
         if ("ALL".equals(statut)) {
             candidatures = candidatureService.findByOffre(offreId);
-        } else {
-            StatutCandidature s = StatutCandidature.valueOf(statut);
-            candidatures = candidatureService.findByOffreAndStatut(offreId, s);
-        }
-
-        // Compter par statut pour les tabs
-        Map<String, Long> counts = new java.util.LinkedHashMap<>();
-        counts.put("ALL", (long) candidatureService.findByOffre(offreId).size());
-        counts.put("APPLIED", countByStatut(offreId, StatutCandidature.APPLIED));
-        counts.put("SHORTLISTED", countByStatut(offreId, StatutCandidature.SHORTLISTED));
-        counts.put("INTERVIEWS", countByStatutList(offreId,
-                List.of(StatutCandidature.INTERVIEW_SCHEDULED, StatutCandidature.INTERVIEW_COMPLETED)));
-        counts.put("HIRED", countByStatut(offreId, StatutCandidature.HIRED));
-        counts.put("REJECTED", countByStatut(offreId, StatutCandidature.REJECTED));
-
-        // Pour INTERVIEWS, combiner scheduled + completed
-        if ("INTERVIEWS".equals(statut)) {
+        } else if ("INTERVIEWS".equals(statut)) {
             candidatures = new java.util.ArrayList<>();
             candidatures.addAll(candidatureService.findByOffreAndStatut(
                     offreId, StatutCandidature.INTERVIEW_SCHEDULED));
             candidatures.addAll(candidatureService.findByOffreAndStatut(
                     offreId, StatutCandidature.INTERVIEW_COMPLETED));
+        } else {
+            StatutCandidature s = StatutCandidature.valueOf(statut);
+            candidatures = candidatureService.findByOffreAndStatut(offreId, s);
         }
+
+        // Counts pour les tabs
+        Map<String, Long> counts = new java.util.LinkedHashMap<>();
+        counts.put("ALL", (long) candidatureService.findByOffre(offreId).size());
+        counts.put("APPLIED", countByStatut(offreId, StatutCandidature.APPLIED));
+        counts.put("SHORTLISTED", countByStatut(offreId, StatutCandidature.SHORTLISTED));
+        counts.put("INTERVIEWS", countByStatutList(offreId,
+                List.of(StatutCandidature.INTERVIEW_SCHEDULED,
+                        StatutCandidature.INTERVIEW_COMPLETED)));
+        counts.put("HIRED", countByStatut(offreId, StatutCandidature.HIRED));
+        counts.put("REJECTED", countByStatut(offreId, StatutCandidature.REJECTED));
 
         model.addAttribute("candidatures", candidatures);
         model.addAttribute("offreId", offreId);

@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/base :: head('Archived Jobs')}"></head>
+<body>
+<nav th:replace="~{layout/base :: navbar}"></nav>
+
+<div class="page-header">
+    <div class="container d-flex justify-content-between align-items-center">
+        <div>
+            <h1>Archived Jobs</h1>
+            <p class="text-muted mb-0">
+                Jobs removed from public listing — data preserved
+            </p>
+        </div>
+        <a th:href="@{/recruteur/offres}" class="btn-outline-custom">
+            <i class="bi bi-arrow-left me-1"></i>Back to My Jobs
+        </a>
+    </div>
+</div>
+
+<div class="container mb-5">
+
+    <div th:if="${success}" class="alert border-0 rounded-3 mb-4"
+         style="background:#f0fdf4;color:#16a34a;">
+        <i class="bi bi-check-circle me-2"></i>
+        <span th:text="${success}"></span>
+    </div>
+
+    <div th:if="${offres.isEmpty()}" class="text-center py-5">
+        <i class="bi bi-archive fs-1 text-muted d-block mb-3"></i>
+        <h5 class="text-muted">No archived jobs</h5>
+        <p class="text-muted">Archived jobs will appear here.</p>
+    </div>
+
+    <div class="row g-3" th:unless="${offres.isEmpty()}">
+        <div class="col-12" th:each="offre : ${offres}">
+            <div class="card-modern card p-4"
+                 style="border-left:4px solid #f59e0b;opacity:0.9">
+                <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+                    <div>
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <h6 class="fw-bold mb-0"
+                                th:text="${offre.titre}"></h6>
+                            <span class="badge rounded-pill"
+                                  style="background:#fff8e1;color:#f59e0b;padding:4px 12px;font-size:0.75rem;border:1px solid #fde68a">
+                                <i class="bi bi-archive me-1"></i>Archived
+                            </span>
+                        </div>
+                        <div class="d-flex gap-2 flex-wrap">
+                            <span class="badge-city" th:if="${offre.ville}"
+                                  th:text="${offre.ville}"></span>
+                            <span class="badge-contract"
+                                  th:text="${offre.typeContrat}"></span>
+                            <small class="text-muted align-self-center">
+                                <i class="bi bi-calendar me-1"></i>
+                                Published
+                                <span th:text="${#temporals.format(offre.datePublication,'dd MMM yyyy')}"></span>
+                            </small>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2 align-items-center">
+                        <!-- View applications -->
+                        <a th:href="@{/recruteur/offres/{id}/candidatures(id=${offre.id})}"
+                           class="btn btn-sm border"
+                           style="border-radius:8px;color:var(--primary);border-color:#c7d2fe;font-size:0.85rem">
+                            <i class="bi bi-people me-1"></i>Applications
+                        </a>
+
+                        <!-- Restore -->
+                        <button type="button"
+                                class="btn btn-sm border fw-600"
+                                style="border-radius:8px;color:#059669;border-color:#a7f3d0;font-size:0.85rem"
+                                th:attr="onclick='showRestoreModal(' + ${offre.id} + ', \'' + ${offre.titre} + '\')'"
+                        >
+                            <i class="bi bi-arrow-counterclockwise me-1"></i>Restore
+                        </button>
+
+                        <!-- Delete permanently -->
+                        <button type="button"
+                                class="btn btn-sm border fw-600"
+                                style="border-radius:8px;color:#ef4444;border-color:#fecaca;font-size:0.85rem"
+                                th:attr="onclick='showDeleteModal(' + ${offre.id} + ', \'' + ${offre.titre} + '\')'"
+                        >
+                            <i class="bi bi-trash me-1"></i>Delete
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Restore Modal -->
+<div class="modal fade" id="restoreModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 rounded-4 shadow-lg">
+            <div class="modal-body p-4 text-center">
+                <div class="rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center"
+                     style="width:64px;height:64px;background:#f0fdf4">
+                    <i class="bi bi-arrow-counterclockwise fs-3"
+                       style="color:#059669"></i>
+                </div>
+                <h5 class="fw-bold mb-2">Restore this job?</h5>
+                <p class="text-muted mb-1">You're about to restore:</p>
+                <p class="fw-600 mb-3" id="restoreJobTitle"
+                   style="color:var(--primary)"></p>
+                <p class="text-muted small mb-4">
+                    The job will be made active again and visible to candidates.
+                </p>
+                <div class="d-flex gap-3 justify-content-center">
+                    <button type="button" class="btn-outline-custom"
+                            data-bs-dismiss="modal">
+                        Cancel
+                    </button>
+                    <form id="restoreForm" method="post">
+                        <button type="submit" class="btn fw-600"
+                                style="background:linear-gradient(135deg,#10b981,#34d399);
+                                       color:white;border:none;padding:10px 24px;
+                                       border-radius:10px">
+                            <i class="bi bi-arrow-counterclockwise me-2"></i>Restore Job
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Permanent Delete Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 rounded-4 shadow-lg">
+            <div class="modal-body p-4 text-center">
+                <div class="rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center"
+                     style="width:64px;height:64px;background:#fef2f2">
+                    <i class="bi bi-trash fs-3" style="color:#ef4444"></i>
+                </div>
+                <h5 class="fw-bold mb-2">Permanently delete?</h5>
+                <p class="text-muted mb-1">You're about to permanently delete:</p>
+                <p class="fw-600 mb-3" id="deleteJobTitle"
+                   style="color:#ef4444"></p>
+                <div class="alert border-0 rounded-3 mb-4"
+                     style="background:#fef2f2;color:#dc2626;font-size:0.85rem">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    <strong>This action cannot be undone.</strong>
+                    All applications and candidate data for this job will be
+                    permanently removed.
+                </div>
+                <div class="d-flex gap-3 justify-content-center">
+                    <button type="button" class="btn-outline-custom"
+                            data-bs-dismiss="modal">
+                        Cancel
+                    </button>
+                    <form id="deleteForm" method="post">
+                        <button type="submit" class="btn fw-600"
+                                style="background:linear-gradient(135deg,#ef4444,#f87171);
+                                       color:white;border:none;padding:10px 24px;
+                                       border-radius:10px">
+                            <i class="bi bi-trash me-2"></i>Delete Permanently
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer class="footer-custom">
+    <div class="container"><p class="mb-0">© 2026 JobBoard</p></div>
+</footer>
+
+<th:block th:replace="~{layout/base :: scripts}"></th:block>
+<script>
+    const restoreModal = new bootstrap.Modal(
+        document.getElementById('restoreModal'));
+    const deleteModal = new bootstrap.Modal(
+        document.getElementById('deleteModal'));
+
+    function showRestoreModal(offreId, titre) {
+        document.getElementById('restoreJobTitle').textContent = titre;
+        document.getElementById('restoreForm').action =
+            '/recruteur/offres/' + offreId + '/restaurer';
+        restoreModal.show();
+    }
+
+    function showDeleteModal(offreId, titre) {
+        document.getElementById('deleteJobTitle').textContent = titre;
+        document.getElementById('deleteForm').action =
+            '/recruteur/offres/' + offreId + '/delete-permanent';
+        deleteModal.show();
+    }
+</script>
+</body>
+</html>

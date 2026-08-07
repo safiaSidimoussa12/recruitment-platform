@@ -5,6 +5,7 @@ import com.jobboard.jobboard.module.candidature.CandidatureRepository;
 import com.jobboard.jobboard.module.recruteur.Recruteur;
 import com.jobboard.jobboard.module.recruteur.RecruteurRepository;
 import com.jobboard.jobboard.shared.domain.StatutOffre;
+
 import com.jobboard.jobboard.shared.domain.TypeContrat;
 import com.jobboard.jobboard.shared.exception.ResourceNotFoundException;
 import jakarta.validation.Valid;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequiredArgsConstructor
@@ -92,14 +94,6 @@ public class OffreController {
         return "redirect:/recruteur/offres";
     }
 
-    @GetMapping("/recruteur/offres")
-    public String mesOffres(@AuthenticationPrincipal UserDetails userDetails, Model model) {
-        Recruteur recruteur = recruteurRepository.findByEmail(userDetails.getUsername())
-                .orElseThrow(() -> new ResourceNotFoundException("Recruteur introuvable."));
-        model.addAttribute("offres", offreService.findByRecruteur(recruteur.getId()));
-        return "recruteur/mes-offres";
-    }
-
     @GetMapping("/recruteur/offres/{id}/edit")
     public String editForm(@PathVariable Long id, Model model) {
         model.addAttribute("offre", offreService.findById(id));
@@ -119,9 +113,43 @@ public class OffreController {
         return "redirect:/recruteur/offres";
     }
 
+    //
+    @GetMapping("/recruteur/offres")
+    public String mesOffres(@AuthenticationPrincipal UserDetails userDetails, Model model) {
+        Recruteur recruteur = recruteurRepository.findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new ResourceNotFoundException("Recruteur introuvable."));
+        model.addAttribute("offres", offreService.findActiveByRecruteur(recruteur.getId()));
+        return "recruteur/mes-offres";
+    }
+
+    @GetMapping("/recruteur/offres/archived")
+    public String archivedOffres(@AuthenticationPrincipal UserDetails userDetails, Model model) {
+        Recruteur recruteur = recruteurRepository.findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new ResourceNotFoundException("Recruteur introuvable."));
+        model.addAttribute("offres", offreService.findArchivedByRecruteur(recruteur.getId()));
+        return "recruteur/archived-offres";
+    }
+
     @PostMapping("/recruteur/offres/{id}/supprimer")
-    public String supprimer(@PathVariable Long id) {
-        offreService.supprimer(id);
+    public String archiver(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        offreService.archiver(id);
+        redirectAttributes.addFlashAttribute("success", "Job archived successfully.");
         return "redirect:/recruteur/offres";
     }
+
+    @PostMapping("/recruteur/offres/{id}/restaurer")
+    public String restaurer(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        offreService.restaurer(id);
+        redirectAttributes.addFlashAttribute("success", "Job restored successfully.");
+        return "redirect:/recruteur/offres/archived";
+    }
+
+    @PostMapping("/recruteur/offres/{id}/delete-permanent")
+    public String supprimerDefinitivement(@PathVariable Long id,
+            RedirectAttributes redirectAttributes) {
+        offreService.supprimerDefinitivement(id);
+        redirectAttributes.addFlashAttribute("success", "Job permanently deleted.");
+        return "redirect:/recruteur/offres/archived";
+    }
+
 }
