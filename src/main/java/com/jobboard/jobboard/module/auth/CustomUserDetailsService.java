@@ -26,6 +26,10 @@ public class CustomUserDetailsService implements UserDetailsService {
         Utilisateur utilisateur = utilisateurRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + email));
 
+        if (utilisateur.getStatut() == StatutCompte.SUSPENDU) {
+            throw new UsernameNotFoundException("Account suspended.");
+        }
+
         return new User(
                 utilisateur.getEmail(),
                 utilisateur.getMotDePasse(),
