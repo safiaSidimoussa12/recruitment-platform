@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/base :: head('Pending Recruiters')}"></head>
+<body>
+<nav th:replace="~{layout/base :: navbar}"></nav>
+
+<div class="page-header">
+    <div class="container d-flex justify-content-between align-items-center">
+        <div>
+            <h1>Pending Recruiters</h1>
+            <p class="text-muted mb-0">Review and approve recruiter registrations</p>
+        </div>
+        <a th:href="@{/admin/dashboard}" class="btn-outline-custom">
+            ← Dashboard
+        </a>
+    </div>
+</div>
+
+<div class="container mb-5">
+
+    <div th:if="${success}" class="alert border-0 rounded-3 mb-4"
+         style="background:#f0fdf4;color:#16a34a;">
+        <i class="bi bi-check-circle me-2"></i>
+        <span th:text="${success}"></span>
+    </div>
+
+    <div th:if="${recruteurs.isEmpty()}" class="text-center py-5">
+        <i class="bi bi-hourglass fs-1 text-muted d-block mb-3"></i>
+        <h5 class="text-muted">No pending recruiter registrations</h5>
+    </div>
+
+    <div class="row g-3" th:unless="${recruteurs.isEmpty()}">
+        <div class="col-12" th:each="r : ${recruteurs}">
+            <div class="card-modern card p-4">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center"
+                             style="width:48px;height:48px;background:var(--gradient);color:white;font-weight:700;font-size:1.1rem"
+                             th:text="${#strings.substring(r.prenom,0,1) + #strings.substring(r.nom,0,1)}">
+                        </div>
+                        <div>
+                            <h6 class="fw-bold mb-0"
+                                th:text="${r.prenom + ' ' + r.nom}"></h6>
+                            <small class="text-muted"
+                                   th:text="${r.email}"></small>
+                            <div class="mt-1">
+                                <small class="text-muted">
+                                    <i class="bi bi-building me-1"></i>
+                                    <span th:text="${r.entreprise.nom}"></span>
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <form th:action="@{/admin/recruteurs/{id}/approuver(id=${r.id})}"
+                              method="post">
+                            <button type="submit" class="btn-primary-custom"
+                                    style="padding:8px 18px;font-size:0.85rem">
+                                <i class="bi bi-check-lg me-1"></i>Approve
+                            </button>
+                        </form>
+                        <form th:action="@{/admin/recruteurs/{id}/rejeter(id=${r.id})}"
+                              method="post">
+                            <button type="submit" class="btn btn-sm border"
+                                    style="border-radius:10px;padding:8px 18px;color:#ef4444;border-color:#fecaca;font-size:0.85rem">
+                                <i class="bi bi-x-lg me-1"></i>Reject
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer class="footer-custom">
+    <div class="container"><p class="mb-0">© 2026 JobBoard</p></div>
+</footer>
+<th:block th:replace="~{layout/base :: scripts}"></th:block>
+</body>
+</html>

@@ -1,5 +1,5 @@
 package com.jobboard.jobboard.shared.domain;
 
 public enum StatutCompte {
-    ACTIF, SUSPENDU
+    ACTIF, SUSPENDU, EN_ATTENTE
 }

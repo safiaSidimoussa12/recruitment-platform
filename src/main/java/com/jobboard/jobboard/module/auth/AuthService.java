@@ -8,6 +8,8 @@ import com.jobboard.jobboard.module.recruteur.Recruteur;
 import com.jobboard.jobboard.module.recruteur.RecruteurRepository;
 import com.jobboard.jobboard.module.auth.dto.RegisterRequest;
 import com.jobboard.jobboard.shared.domain.Role;
+import com.jobboard.jobboard.shared.domain.StatutCompte;
+import com.jobboard.jobboard.shared.domain.StatutEntreprise;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -25,7 +27,7 @@ public class AuthService {
     @Transactional
     public void registerCandidat(RegisterRequest request) {
         if (candidatRepository.findByEmail(request.getEmail()).isPresent()) {
-            throw new IllegalArgumentException("Email déjà utilisé.");
+            throw new IllegalArgumentException("Email already in use.");
         }
         Candidat candidat = new Candidat();
         candidat.setEmail(request.getEmail());
@@ -33,6 +35,7 @@ public class AuthService {
         candidat.setRole(Role.CANDIDAT);
         candidat.setNom(request.getNom());
         candidat.setPrenom(request.getPrenom());
+        candidat.setStatut(StatutCompte.ACTIF);
         candidatRepository.save(candidat);
     }
 
@@ -42,7 +45,6 @@ public class AuthService {
             throw new IllegalArgumentException("Email already in use.");
         }
 
-        // Créer une entreprise par défaut si pas fournie
         Entreprise entreprise;
         if (request.getEntrepriseId() != null) {
             entreprise = entrepriseRepository.findById(request.getEntrepriseId())
@@ -52,7 +54,7 @@ public class AuthService {
             entreprise.setNom(request.getNomEntreprise() != null
                     ? request.getNomEntreprise()
                     : "My Company");
-            entreprise.setStatut(com.jobboard.jobboard.shared.domain.StatutEntreprise.ACTIVE);
+            entreprise.setStatut(StatutEntreprise.ACTIVE);
             entreprise = entrepriseRepository.save(entreprise);
         }
 
@@ -63,6 +65,11 @@ public class AuthService {
         recruteur.setNom(request.getNom());
         recruteur.setPrenom(request.getPrenom());
         recruteur.setEntreprise(entreprise);
+        recruteur.setStatut(StatutCompte.EN_ATTENTE);
+
+        System.out.println("=== Statut avant save: " + recruteur.getStatut());
         recruteurRepository.save(recruteur);
+        System.out.println("=== Statut après save: " + recruteur.getStatut());
+
     }
 }

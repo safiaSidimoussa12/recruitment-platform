@@ -16,6 +16,9 @@ import java.util.List;
 public class OffreService {
 
     private final OffreRepository offreRepository;
+    private final com.jobboard.jobboard.module.messagerie.MessageRepository messageRepository;
+    private final com.jobboard.jobboard.module.candidature.InterviewDetailsRepository interviewDetailsRepository;
+    private final com.jobboard.jobboard.module.favori.FavoriRepository favoriRepository;
 
     public Page<Offre> search(String keyword, String ville, String domaine,
             TypeContrat typeContrat, Double salaireMin,
@@ -73,35 +76,54 @@ public class OffreService {
                 });
     }
 
+    @Transactional
+    public void archiver(Long id) {
+        Offre offre = findById(id);
+        offre.setStatut(StatutOffre.SUPPRIMEE);
+        offreRepository.save(offre);
+    }
 
     @Transactional
-public void archiver(Long id) {
-    Offre offre = findById(id);
-    offre.setStatut(StatutOffre.SUPPRIMEE);
-    offreRepository.save(offre);
-}
+    public void restaurer(Long id) {
+        Offre offre = findById(id);
+        offre.setStatut(StatutOffre.PUBLIEE);
+        offreRepository.save(offre);
+    }
 
-@Transactional
-public void restaurer(Long id) {
-    Offre offre = findById(id);
-    offre.setStatut(StatutOffre.PUBLIEE);
-    offreRepository.save(offre);
-}
+    @Transactional
+    public void supprimerDefinitivement(Long id) {
+        Offre offre = findById(id);
 
-@Transactional
-public void supprimerDefinitivement(Long id) {
-    offreRepository.deleteById(id);
-}
+        // Supprimer les candidatures liées
+        List<com.jobboard.jobboard.module.candidature.Candidature> candidatures = offre.getCandidatures();
 
-public List<Offre> findArchivedByRecruteur(Long recruteurId) {
-    return offreRepository.findByRecruteurId(recruteurId).stream()
-        .filter(o -> o.getStatut() == StatutOffre.SUPPRIMEE)
-        .toList();
-}
+        for (var candidature : candidatures) {
+            // Supprimer les messages
+            messageRepository.deleteAll(
+                    messageRepository.findByCandidatureIdOrderByDateEnvoiAsc(candidature.getId()));
+            // Supprimer les interview details
+            interviewDetailsRepository.findByCandidatureId(candidature.getId())
+                    .ifPresent(interviewDetailsRepository::delete);
+        }
 
-public List<Offre> findActiveByRecruteur(Long recruteurId) {
-    return offreRepository.findByRecruteurId(recruteurId).stream()
-        .filter(o -> o.getStatut() != StatutOffre.SUPPRIMEE)
-        .toList();
-}
+        // Supprimer les favoris liés
+        favoriRepository.deleteAll(
+                favoriRepository.findAll().stream()
+                        .filter(f -> f.getOffre().getId().equals(id))
+                        .toList());
+
+        offreRepository.delete(offre);
+    }
+
+    public List<Offre> findArchivedByRecruteur(Long recruteurId) {
+        return offreRepository.findByRecruteurId(recruteurId).stream()
+                .filter(o -> o.getStatut() == StatutOffre.SUPPRIMEE)
+                .toList();
+    }
+
+    public List<Offre> findActiveByRecruteur(Long recruteurId) {
+        return offreRepository.findByRecruteurId(recruteurId).stream()
+                .filter(o -> o.getStatut() != StatutOffre.SUPPRIMEE)
+                .toList();
+    }
 }

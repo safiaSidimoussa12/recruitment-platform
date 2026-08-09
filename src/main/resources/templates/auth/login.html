@@ -15,20 +15,47 @@
                         <p class="opacity-75 mb-0">Sign in to your JobBoard account</p>
                     </div>
                     <div class="card-body p-4">
+
+                        <!-- Invalid credentials -->
                         <div th:if="${param.error}" class="alert border-0 rounded-3 mb-4"
                              style="background:#fef2f2; color:#dc2626;">
                             <i class="bi bi-exclamation-circle me-2"></i>
                             Invalid email or password.
                         </div>
+
+                        <!-- Pending approval -->
+                        <div th:if="${param.pending}" class="alert border-0 rounded-3 mb-4"
+                             style="background:#fffbeb; color:#d97706;">
+                            <i class="bi bi-hourglass me-2"></i>
+                            Your account is pending admin approval. You'll be notified once approved.
+                        </div>
+
+                        <!-- Suspended -->
+                        <div th:if="${param.suspended}" class="alert border-0 rounded-3 mb-4"
+                             style="background:#fef2f2; color:#dc2626;">
+                            <i class="bi bi-slash-circle me-2"></i>
+                            Your account has been suspended. Contact support.
+                        </div>
+
+                        <!-- Registered success -->
                         <div th:if="${param.registered}" class="alert border-0 rounded-3 mb-4"
                              style="background:#f0fdf4; color:#16a34a;">
                             <i class="bi bi-check-circle me-2"></i>
                             Account created! You can now sign in.
                         </div>
+
+                        <!-- Pending approval after recruiter registration -->
+                        <div th:if="${param.pendingApproval}" class="alert border-0 rounded-3 mb-4"
+                             style="background:#fffbeb; color:#d97706;">
+                            <i class="bi bi-hourglass me-2"></i>
+                            Your recruiter account has been submitted and is pending admin approval.
+                        </div>
+
                         <form th:action="@{/login}" method="post">
                             <div class="mb-3">
                                 <label class="form-label fw-600 text-muted small">EMAIL</label>
-                                <input type="email" name="username" class="form-control form-control-modern"
+                                <input type="email" name="username"
+                                       class="form-control form-control-modern"
                                        placeholder="you@example.com" required/>
                             </div>
                             <div class="mb-4">
@@ -37,14 +64,16 @@
                                        class="form-control form-control-modern"
                                        placeholder="••••••••" required/>
                             </div>
-                            <button type="submit" class="btn-primary-custom w-100 d-block text-center">
+                            <button type="submit"
+                                    class="btn-primary-custom w-100 d-block text-center">
                                 Sign In <i class="bi bi-arrow-right ms-1"></i>
                             </button>
                         </form>
                         <hr class="my-4"/>
                         <p class="text-center text-muted mb-0">
                             Don't have an account?
-                            <a th:href="@{/register}" style="color:var(--primary); font-weight:600;">
+                            <a th:href="@{/register}"
+                               style="color:var(--primary); font-weight:600;">
                                 Register
                             </a>
                         </p>

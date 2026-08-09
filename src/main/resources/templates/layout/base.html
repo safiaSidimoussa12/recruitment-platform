@@ -424,11 +424,11 @@
                         <i class="bi bi-briefcase me-1"></i>My Jobs
                     </a>
                 </li>
-            <li class="nav-item" sec:authorize="hasRole('RECRUTEUR')">
-    <a class="nav-link-custom" th:href="@{/recruteur/offres}">
-        <i class="bi bi-people me-1"></i>Applications
-    </a>
-</li>
+                <li class="nav-item" sec:authorize="hasRole('RECRUTEUR')">
+                   <a class="nav-link-custom" th:href="@{/recruteur/offres}">
+                     <i class="bi bi-people me-1"></i>Applications
+                     </a>
+                 </li>
                 <li class="nav-item" sec:authorize="hasRole('RECRUTEUR')">
                     <a class="nav-link-custom" th:href="@{/recruteur/profil}">
                         <i class="bi bi-person me-1"></i>Profile
@@ -446,6 +446,12 @@
                 </li>
                 <li class="nav-item" sec:authorize="hasRole('ADMIN')">
                     <a class="nav-link-custom" th:href="@{/admin/entreprises}">Companies</a>
+                </li>
+
+                <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+                      <a class="nav-link-custom" th:href="@{/admin/recruteurs/pending}">
+                                         <i class="bi bi-hourglass me-1"></i>Pending
+                       </a>
                 </li>
 
                 <!-- Logout -->

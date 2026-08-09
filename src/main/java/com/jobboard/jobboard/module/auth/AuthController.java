@@ -1,6 +1,8 @@
 package com.jobboard.jobboard.module.auth;
 
 import com.jobboard.jobboard.module.auth.dto.RegisterRequest;
+import com.jobboard.jobboard.shared.domain.StatutCompte;
+
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -46,10 +48,11 @@ public class AuthController {
             return "auth/register";
         try {
             authService.registerRecruteur(request);
-            return "redirect:/login?registered";
+            return "redirect:/login?pendingApproval";
         } catch (IllegalArgumentException e) {
             model.addAttribute("erreur", e.getMessage());
             return "auth/register";
         }
     }
+
 }

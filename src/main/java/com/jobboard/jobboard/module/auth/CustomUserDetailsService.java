@@ -1,8 +1,12 @@
 package com.jobboard.jobboard.module.auth;
 
+import com.jobboard.jobboard.shared.domain.StatutCompte;
 import com.jobboard.jobboard.shared.domain.Utilisateur;
 import com.jobboard.jobboard.shared.domain.UtilisateurRepository;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;

@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 import com.jobboard.jobboard.shared.domain.StatutCompte;
 
 @Controller
@@ -20,16 +22,6 @@ public class AdminController {
     private final RecruteurRepository recruteurRepository;
     private final EntrepriseService entrepriseService;
     private final OffreService offreService;
-
-    @GetMapping("/dashboard")
-    public String dashboard(Model model) {
-        model.addAttribute("totalUtilisateurs", adminRepository.count());
-        model.addAttribute("totalOffres", offreService.findByRecruteur(null) != null
-                ? offreService.findByRecruteur(null).size()
-                : 0);
-        model.addAttribute("totalEntreprises", entrepriseService.findAll().size());
-        return "admin/dashboard";
-    }
 
     @GetMapping("/utilisateurs")
     public String utilisateurs(Model model) {
@@ -65,5 +57,41 @@ public class AdminController {
     public String suspendrEntreprise(@PathVariable Long id) {
         entrepriseService.suspendre(id);
         return "redirect:/admin/entreprises";
+    }
+
+    @PostMapping("/recruteurs/{id}/approuver")
+    public String approuver(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        recruteurRepository.findById(id).ifPresent(r -> {
+            r.setStatut(StatutCompte.ACTIF);
+            recruteurRepository.save(r);
+        });
+        redirectAttributes.addFlashAttribute("success", "Recruiter approved successfully.");
+        return "redirect:/admin/recruteurs/pending";
+    }
+
+    @PostMapping("/recruteurs/{id}/rejeter")
+    public String rejeter(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        recruteurRepository.findById(id).ifPresent(r -> {
+            r.setStatut(StatutCompte.SUSPENDU);
+            recruteurRepository.save(r);
+        });
+        redirectAttributes.addFlashAttribute("success", "Recruiter rejected.");
+        return "redirect:/admin/recruteurs/pending";
+    }
+
+    @GetMapping("/recruteurs/pending")
+    public String pendingRecruteurs(Model model) {
+        model.addAttribute("recruteurs",
+                recruteurRepository.findByStatut(StatutCompte.EN_ATTENTE));
+        return "admin/pending-recruteurs";
+    }
+
+    @GetMapping("/dashboard")
+    public String dashboard(Model model) {
+        model.addAttribute("totalUtilisateurs", adminRepository.count());
+        model.addAttribute("totalEntreprises", entrepriseService.findAll().size());
+        model.addAttribute("pendingRecruteurs",
+                recruteurRepository.findByStatut(StatutCompte.EN_ATTENTE).size());
+        return "admin/dashboard";
     }
 }

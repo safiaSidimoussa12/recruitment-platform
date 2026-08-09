@@ -1,8 +1,8 @@
 package com.jobboard.jobboard.module.candidat;
 
-import com.jobboard.jobboard.shared.domain.Utilisateur;
 import com.jobboard.jobboard.module.candidature.Candidature;
 import com.jobboard.jobboard.module.favori.Favori;
+import com.jobboard.jobboard.shared.domain.Utilisateur;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
