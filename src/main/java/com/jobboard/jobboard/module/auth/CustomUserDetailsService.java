@@ -4,9 +4,7 @@ import com.jobboard.jobboard.shared.domain.StatutCompte;
 import com.jobboard.jobboard.shared.domain.Utilisateur;
 import com.jobboard.jobboard.shared.domain.UtilisateurRepository;
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.security.authentication.DisabledException;
-import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -26,13 +24,18 @@ public class CustomUserDetailsService implements UserDetailsService {
         Utilisateur utilisateur = utilisateurRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + email));
 
-        if (utilisateur.getStatut() == StatutCompte.SUSPENDU) {
-            throw new UsernameNotFoundException("Account suspended.");
-        }
+        boolean enabled = utilisateur.getStatut() == StatutCompte.ACTIF;
+        boolean suspended = utilisateur.getStatut() == StatutCompte.SUSPENDU;
+        boolean pending = utilisateur.getStatut() == StatutCompte.EN_ATTENTE;
 
-        return new User(
-                utilisateur.getEmail(),
-                utilisateur.getMotDePasse(),
-                List.of(new SimpleGrantedAuthority("ROLE_" + utilisateur.getRole().name())));
+        return User.builder()
+                .username(utilisateur.getEmail())
+                .password(utilisateur.getMotDePasse())
+                .authorities("ROLE_" + utilisateur.getRole().name())
+                .accountExpired(false)
+                .accountLocked(suspended)
+                .credentialsExpired(pending)
+                .disabled(!enabled && !suspended && !pending ? true : false)
+                .build();
     }
 }

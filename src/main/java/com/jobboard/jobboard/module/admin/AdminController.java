@@ -22,10 +22,11 @@ public class AdminController {
     private final RecruteurRepository recruteurRepository;
     private final EntrepriseService entrepriseService;
     private final OffreService offreService;
+    private final com.jobboard.jobboard.shared.domain.UtilisateurRepository utilisateurRepository;
 
     @GetMapping("/utilisateurs")
     public String utilisateurs(Model model) {
-        model.addAttribute("utilisateurs", adminRepository.findAll());
+        model.addAttribute("utilisateurs", utilisateurRepository.findAllAsView());
         return "admin/utilisateurs";
     }
 

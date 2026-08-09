@@ -83,11 +83,12 @@ public class SecurityConfig {
                                                         }
                                                 })
                                                 .failureHandler((request, response, exception) -> {
-                                                        String msg = exception.getClass().getSimpleName();
-                                                        if (msg.contains("Disabled")) {
-                                                                response.sendRedirect("/login?pending");
-                                                        } else if (msg.contains("Locked")) {
+                                                        String exceptionClass = exception.getClass().getSimpleName();
+
+                                                        if (exceptionClass.contains("Locked")) {
                                                                 response.sendRedirect("/login?suspended");
+                                                        } else if (exceptionClass.contains("Credentials")) {
+                                                                response.sendRedirect("/login?pending");
                                                         } else {
                                                                 response.sendRedirect("/login?error");
                                                         }
