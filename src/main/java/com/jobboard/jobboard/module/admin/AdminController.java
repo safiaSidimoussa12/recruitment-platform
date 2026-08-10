@@ -1,6 +1,7 @@
 package com.jobboard.jobboard.module.admin;
 
 import com.jobboard.jobboard.module.candidat.CandidatRepository;
+import com.jobboard.jobboard.module.entreprise.Entreprise;
 import com.jobboard.jobboard.module.entreprise.EntrepriseService;
 import com.jobboard.jobboard.module.offre.OffreService;
 import com.jobboard.jobboard.module.recruteur.RecruteurRepository;
@@ -23,6 +24,7 @@ public class AdminController {
     private final EntrepriseService entrepriseService;
     private final OffreService offreService;
     private final com.jobboard.jobboard.shared.domain.UtilisateurRepository utilisateurRepository;
+    private final com.jobboard.jobboard.module.entreprise.EntrepriseRepository entrepriseRepository;
 
     @GetMapping("/utilisateurs")
     public String utilisateurs(Model model) {
@@ -73,8 +75,24 @@ public class AdminController {
     @PostMapping("/recruteurs/{id}/rejeter")
     public String rejeter(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         recruteurRepository.findById(id).ifPresent(r -> {
+            Entreprise entreprise = r.getEntreprise();
+
+            // Vérifie si l'entreprise a d'autres recruteurs actifs
+            boolean hasActiveRecruiters = entreprise.getRecruteurs().stream()
+                    .anyMatch(rec -> !rec.getId().equals(r.getId())
+                            && rec.getStatut() == StatutCompte.ACTIF);
+
+            // Suspend le recruteur
             r.setStatut(StatutCompte.SUSPENDU);
+            if (!hasActiveRecruiters) {
+                r.setEntreprise(null); // dissocier avant suppression
+            }
             recruteurRepository.save(r);
+
+            // Supprime l'entreprise si pas d'autres recruteurs actifs
+            if (!hasActiveRecruiters) {
+                entrepriseRepository.delete(entreprise);
+            }
         });
         redirectAttributes.addFlashAttribute("success", "Recruiter rejected.");
         return "redirect:/admin/recruteurs/pending";

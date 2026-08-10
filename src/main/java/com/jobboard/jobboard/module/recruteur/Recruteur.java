@@ -25,7 +25,7 @@ public class Recruteur extends Utilisateur {
     private String telephone;
 
     @ManyToOne
-    @JoinColumn(name = "entreprise_id", nullable = false)
+    @JoinColumn(name = "entreprise_id", nullable = true)
     private Entreprise entreprise;
 
     @OneToMany(mappedBy = "recruteur")
