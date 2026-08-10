@@ -152,4 +152,29 @@ public class OffreController {
         return "redirect:/recruteur/offres/archived";
     }
 
+    @GetMapping("/offres/search")
+    public String search(@RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String ville,
+            @RequestParam(required = false) String domaine,
+            @RequestParam(required = false) TypeContrat typeContrat,
+            @RequestParam(required = false) Double salaireMin,
+            @RequestParam(defaultValue = "0") int page,
+            Model model) {
+        Page<Offre> offres = offreService.search(keyword, ville, domaine,
+                typeContrat, salaireMin, page, 10);
+        model.addAttribute("offres", offres);
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("ville", ville);
+        model.addAttribute("domaine", domaine);
+        model.addAttribute("typeContrat", typeContrat);
+        model.addAttribute("salaireMin", salaireMin);
+        model.addAttribute("typesContrat", TypeContrat.values());
+        return "offre/liste";
+    }
+
+    // not sure
+    @GetMapping("/")
+    public String home() {
+        return "redirect:/offres";
+    }
 }
