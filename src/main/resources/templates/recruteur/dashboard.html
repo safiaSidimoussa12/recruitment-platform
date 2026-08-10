@@ -57,9 +57,11 @@
                 <h2 class="fw-bold mb-1" style="color:var(--accent)"
                     th:text="${messagesNonLus}">0</h2>
                 <p class="text-muted mb-0">Unread Messages</p>
-                <span class="d-inline-block mt-3 text-muted small">
-                    Via applications
-                </span>
+                        <a th:href="@{/recruteur/messages}"
+                        class="btn-primary-custom d-inline-block mt-3"
+                             style="font-size:0.8rem;padding:6px 14px">
+                               View Messages
+                       </a>
             </div>
         </div>
 

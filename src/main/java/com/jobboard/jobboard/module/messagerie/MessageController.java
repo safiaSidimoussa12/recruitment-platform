@@ -9,6 +9,9 @@ import com.jobboard.jobboard.module.recruteur.RecruteurRepository;
 import com.jobboard.jobboard.shared.domain.Utilisateur;
 import com.jobboard.jobboard.shared.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
+
+import java.util.List;
+import java.util.Map;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -23,6 +26,8 @@ public class MessageController {
     private final CandidatRepository candidatRepository;
     private final RecruteurRepository recruteurRepository;
     private final CandidatureRepository candidatureRepository;
+
+    private final com.jobboard.jobboard.module.messagerie.MessageRepository messageRepository;
 
     @GetMapping("/messages/{candidatureId}")
     public String conversation(@PathVariable Long candidatureId,
@@ -40,6 +45,9 @@ public class MessageController {
             destinataireId = candidature.getCandidat().getId();
         }
 
+        // Marquer les messages comme lus automatiquement
+        messageService.marquerLus(candidatureId, currentUser.getId());
+
         model.addAttribute("messages", messageService.findByCandidature(candidatureId));
         model.addAttribute("candidatureId", candidatureId);
         model.addAttribute("destinataireId", destinataireId);
@@ -56,6 +64,28 @@ public class MessageController {
         Utilisateur destinataire = getUtilisateurById(destinataireId);
         messageService.envoyer(candidatureId, expediteur, destinataire, contenu);
         return "redirect:/messages/" + candidatureId;
+    }
+
+    @GetMapping("/recruteur/messages")
+    public String messagesGlobaux(@AuthenticationPrincipal UserDetails userDetails,
+            Model model) {
+        Recruteur recruteur = recruteurRepository.findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new ResourceNotFoundException("Recruiter not found."));
+
+        List<Candidature> conversations = messageService
+                .findConversationsByRecruteur(recruteur.getId());
+
+        // Pour chaque conversation, compter les messages non lus
+        Map<Long, Long> unreadCounts = conversations.stream()
+                .collect(java.util.stream.Collectors.toMap(
+                        Candidature::getId,
+                        c -> messageRepository.countByCandidatureIdAndLuFalseAndDestinataireId(
+                                c.getId(), recruteur.getId())));
+
+        model.addAttribute("conversations", conversations);
+        model.addAttribute("unreadCounts", unreadCounts);
+        model.addAttribute("recruteurId", recruteur.getId());
+        return "recruteur/messages";
     }
 
     private Utilisateur getUtilisateurByEmail(String email) {

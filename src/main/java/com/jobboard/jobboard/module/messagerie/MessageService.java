@@ -44,4 +44,19 @@ public class MessageService {
                     messageRepository.save(m);
                 });
     }
+
+    public List<Message> findUnreadByDestinataire(Long destinataireId) {
+        return messageRepository.findAll().stream()
+                .filter(m -> m.getDestinataire().getId().equals(destinataireId) && !m.getLu())
+                .toList();
+    }
+
+    public List<Candidature> findConversationsByRecruteur(Long recruteurId) {
+        return messageRepository.findAll().stream()
+                .filter(m -> m.getDestinataire().getId().equals(recruteurId)
+                        || m.getExpediteur().getId().equals(recruteurId))
+                .map(m -> m.getCandidature())
+                .distinct()
+                .toList();
+    }
 }
