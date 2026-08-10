@@ -9,6 +9,10 @@ import java.util.Optional;
 public interface UtilisateurRepository extends JpaRepository<Utilisateur, Long> {
     Optional<Utilisateur> findByEmail(String email);
 
-    @Query(value = "SELECT id, email, role, statut, date_creation FROM utilisateur", nativeQuery = true)
+    // @Query(value = "SELECT id, email, role, statut, date_creation FROM
+    // utilisateur", nativeQuery = true)
+    // List<UtilisateurView> findAllAsView();
+
+    @Query(value = "SELECT id, email, role, statut, date_creation FROM utilisateur WHERE role != 'ADMIN'", nativeQuery = true)
     List<UtilisateurView> findAllAsView();
 }

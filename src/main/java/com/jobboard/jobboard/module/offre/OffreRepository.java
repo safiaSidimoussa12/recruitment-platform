@@ -34,4 +34,6 @@ public interface OffreRepository extends JpaRepository<Offre, Long> {
     List<Offre> findByEntrepriseId(Long entrepriseId);
 
     List<Offre> findByRecruteurId(Long recruteurId);
+
+    long countByStatut(StatutOffre statut);
 }

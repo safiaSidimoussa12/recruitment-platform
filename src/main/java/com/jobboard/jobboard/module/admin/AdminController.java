@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import com.jobboard.jobboard.shared.domain.StatutOffre;
 
 import com.jobboard.jobboard.shared.domain.StatutCompte;
 
@@ -25,6 +26,7 @@ public class AdminController {
     private final OffreService offreService;
     private final com.jobboard.jobboard.shared.domain.UtilisateurRepository utilisateurRepository;
     private final com.jobboard.jobboard.module.entreprise.EntrepriseRepository entrepriseRepository;
+    private final com.jobboard.jobboard.module.offre.OffreRepository offreRepository;
 
     @GetMapping("/utilisateurs")
     public String utilisateurs(Model model) {
@@ -109,6 +111,7 @@ public class AdminController {
     public String dashboard(Model model) {
         model.addAttribute("totalUtilisateurs", adminRepository.count());
         model.addAttribute("totalEntreprises", entrepriseService.findAll().size());
+        model.addAttribute("totalOffres", offreRepository.countByStatut(StatutOffre.PUBLIEE));
         model.addAttribute("pendingRecruteurs",
                 recruteurRepository.findByStatut(StatutCompte.EN_ATTENTE).size());
         return "admin/dashboard";
