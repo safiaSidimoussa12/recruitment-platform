@@ -11,6 +11,9 @@ import com.jobboard.jobboard.shared.domain.Utilisateur;
 public interface AdminRepository extends JpaRepository<Utilisateur, Long> {
     List<Utilisateur> findByStatut(StatutCompte statut);
 
-    @Query("SELECT COUNT(u) FROM Utilisateur u WHERE u.statut = 'ACTIF'")
-    long countUtilisateursActifs();
+    // @Query("SELECT COUNT(u) FROM Utilisateur u WHERE u.statut = 'ACTIF'")
+    // long countUtilisateursActifs();
+
+    @Query(value = "SELECT COUNT(*) FROM utilisateur WHERE role != 'ADMIN'", nativeQuery = true)
+    long countNonAdmins();
 }

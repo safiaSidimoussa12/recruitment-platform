@@ -109,11 +109,12 @@ public class AdminController {
 
     @GetMapping("/dashboard")
     public String dashboard(Model model) {
-        model.addAttribute("totalUtilisateurs", adminRepository.count());
+        model.addAttribute("totalUtilisateurs", adminRepository.countNonAdmins());
         model.addAttribute("totalEntreprises", entrepriseService.findAll().size());
         model.addAttribute("totalOffres", offreRepository.countByStatut(StatutOffre.PUBLIEE));
         model.addAttribute("pendingRecruteurs",
                 recruteurRepository.findByStatut(StatutCompte.EN_ATTENTE).size());
+
         return "admin/dashboard";
     }
 }
