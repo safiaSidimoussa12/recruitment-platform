@@ -413,11 +413,16 @@
                     </a>
                 </li>
 
-                <li class="nav-item" sec:authorize="hasRole('CANDIDAT')">
-                      <a class="nav-link-custom" th:href="@{/candidat/messages}">
-                           <i class="bi bi-chat-dots me-1"></i>Messages
-                     </a>
-                </li>
+                       <li class="nav-item" sec:authorize="hasRole('CANDIDAT')">
+    <a class="nav-link-custom position-relative" th:href="@{/candidat/messages}">
+        <i class="bi bi-chat-dots me-1"></i>Messages
+        <span th:if="${unreadMessages > 0}"
+              class="position-absolute top-0 start-100 translate-middle badge rounded-pill"
+              style="background:var(--secondary);font-size:0.65rem;padding:3px 6px"
+              th:text="${unreadMessages}">
+        </span>
+    </a>
+</li>
 
 
 
@@ -463,11 +468,16 @@
                        </a>
                 </li>
                <!-- msg -->
-                <li class="nav-item" sec:authorize="hasRole('RECRUTEUR')">
-                     <a class="nav-link-custom" th:href="@{/recruteur/messages}">
-               <i class="bi bi-chat-dots me-1"></i>Messages
-                   </a>
-                </li>
+           <li class="nav-item" sec:authorize="hasRole('RECRUTEUR')">
+    <a class="nav-link-custom position-relative" th:href="@{/recruteur/messages}">
+        <i class="bi bi-chat-dots me-1"></i>Messages
+        <span th:if="${unreadMessages > 0}"
+              class="position-absolute top-0 start-100 translate-middle badge rounded-pill"
+              style="background:var(--secondary);font-size:0.65rem;padding:3px 6px"
+              th:text="${unreadMessages}">
+        </span>
+    </a>
+</li>
 
                 <!-- Logout -->
                 <li class="nav-item ms-2" sec:authorize="isAuthenticated()">
