@@ -59,4 +59,13 @@ public class MessageService {
                 .distinct()
                 .toList();
     }
+
+    public List<Candidature> findConversationsByCandidat(Long candidatId) {
+        return messageRepository.findAll().stream()
+                .filter(m -> m.getDestinataire().getId().equals(candidatId)
+                        || m.getExpediteur().getId().equals(candidatId))
+                .map(m -> m.getCandidature())
+                .distinct()
+                .toList();
+    }
 }

@@ -88,6 +88,26 @@ public class MessageController {
         return "recruteur/messages";
     }
 
+    @GetMapping("/candidat/messages")
+    public String messagesCandidat(@AuthenticationPrincipal UserDetails userDetails,
+            Model model) {
+        Candidat candidat = candidatRepository.findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new ResourceNotFoundException("Candidat not found."));
+
+        List<Candidature> conversations = messageService
+                .findConversationsByCandidat(candidat.getId());
+
+        Map<Long, Long> unreadCounts = conversations.stream()
+                .collect(java.util.stream.Collectors.toMap(
+                        Candidature::getId,
+                        c -> messageRepository.countByCandidatureIdAndLuFalseAndDestinataireId(
+                                c.getId(), candidat.getId())));
+
+        model.addAttribute("conversations", conversations);
+        model.addAttribute("unreadCounts", unreadCounts);
+        return "candidat/messages";
+    }
+
     private Utilisateur getUtilisateurByEmail(String email) {
         return candidatRepository.findByEmail(email)
                 .map(c -> (Utilisateur) c)

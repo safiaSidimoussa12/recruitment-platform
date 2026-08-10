@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/base :: head('Messages')}"></head>
+<body>
+<nav th:replace="~{layout/base :: navbar}"></nav>
+
+<div class="page-header">
+    <div class="container d-flex justify-content-between align-items-center">
+        <div>
+            <h1>Messages</h1>
+            <p class="text-muted mb-0">Your conversations with recruiters</p>
+        </div>
+        <a th:href="@{/offres}" class="btn-outline-custom">
+            ← Browse Jobs
+        </a>
+    </div>
+</div>
+
+<div class="container mb-5">
+
+    <div th:if="${conversations.isEmpty()}" class="text-center py-5">
+        <i class="bi bi-chat fs-1 text-muted d-block mb-3"></i>
+        <h5 class="text-muted">No conversations yet</h5>
+        <p class="text-muted">
+            Apply to jobs and start conversations with recruiters.
+        </p>
+        <a th:href="@{/offres}" class="btn-primary-custom d-inline-block mt-2">
+            Browse Jobs
+        </a>
+    </div>
+
+    <div class="row g-3" th:unless="${conversations.isEmpty()}">
+        <div class="col-12" th:each="c : ${conversations}">
+            <a th:href="@{/messages/{id}(id=${c.id})}"
+               class="card-modern card p-4 text-decoration-none d-block">
+
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center gap-3">
+
+                        <!-- Company Avatar -->
+                        <div class="rounded-circle d-flex align-items-center justify-content-center"
+                             style="width:48px;height:48px;background:linear-gradient(135deg,#10b981,#06b6d4);color:white;font-weight:700;font-size:1.1rem;flex-shrink:0"
+                             th:text="${#strings.substring(c.offre.entreprise.nom,0,1).toUpperCase()}">
+                        </div>
+
+                        <div>
+                            <h6 class="fw-bold mb-0 text-dark"
+                                th:text="${c.offre.entreprise.nom}"></h6>
+                            <small class="text-muted"
+                                   th:text="${c.offre.recruteur.prenom + ' ' + c.offre.recruteur.nom}"></small>
+                            <div class="mt-1">
+                                <small style="color:var(--primary)">
+                                    <i class="bi bi-briefcase me-1"></i>
+                                    <span th:text="${c.offre.titre}"></span>
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex flex-column align-items-end gap-2">
+                        <!-- Unread badge -->
+                        <span th:if="${unreadCounts[c.id] > 0}"
+                              class="badge rounded-pill text-white"
+                              style="background:var(--gradient);padding:5px 12px;font-size:0.8rem">
+                            <i class="bi bi-envelope-fill me-1"></i>
+                            <span th:text="${unreadCounts[c.id]}"></span> unread
+                        </span>
+                        <span th:unless="${unreadCounts[c.id] > 0}"
+                              class="badge rounded-pill"
+                              style="background:#f1f5f9;color:#64748b;padding:5px 12px;font-size:0.8rem">
+                            <i class="bi bi-check2-all me-1"></i>All read
+                        </span>
+
+                        <!-- Application status -->
+                        <span th:switch="${c.statut.name()}">
+                            <span th:case="'APPLIED'" class="badge rounded-pill"
+                                  style="background:#e0e7ff;color:#4f46e5;padding:4px 10px;font-size:0.75rem">
+                                📋 Applied
+                            </span>
+                            <span th:case="'SHORTLISTED'" class="badge rounded-pill"
+                                  style="background:#dbeafe;color:#2563eb;padding:4px 10px;font-size:0.75rem">
+                                ⭐ Shortlisted
+                            </span>
+                            <span th:case="'INTERVIEW_SCHEDULED'" class="badge rounded-pill"
+                                  style="background:#d1fae5;color:#059669;padding:4px 10px;font-size:0.75rem">
+                                📅 Interview Scheduled
+                            </span>
+                            <span th:case="'INTERVIEW_COMPLETED'" class="badge rounded-pill"
+                                  style="background:#ede9fe;color:#7c3aed;padding:4px 10px;font-size:0.75rem">
+                                ✅ Interview Done
+                            </span>
+                            <span th:case="'HIRED'" class="badge rounded-pill"
+                                  style="background:#d1fae5;color:#065f46;padding:4px 10px;font-size:0.75rem">
+                                🎉 Hired
+                            </span>
+                            <span th:case="'REJECTED'" class="badge rounded-pill"
+                                  style="background:#fee2e2;color:#dc2626;padding:4px 10px;font-size:0.75rem">
+                                ❌ Rejected
+                            </span>
+                        </span>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+
+<footer class="footer-custom">
+    <div class="container">
+        <p class="mb-0">© 2026 CareerBridge — All rights reserved</p>
+    </div>
+</footer>
+<th:block th:replace="~{layout/base :: scripts}"></th:block>
+</body>
+</html>
