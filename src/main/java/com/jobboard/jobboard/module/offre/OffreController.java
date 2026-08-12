@@ -27,6 +27,7 @@ public class OffreController {
     private final RecruteurRepository recruteurRepository;
     private final CandidatRepository candidatRepository;
     private final CandidatureRepository candidatureRepository;
+    private final com.jobboard.jobboard.module.favori.FavoriRepository favoriRepository;
 
     // ── Public ──────────────────────────────────────────
 
@@ -63,6 +64,10 @@ public class OffreController {
                 boolean dejaPostule = candidatureRepository
                         .existsByCandidatAndOffre(candidat, offre);
                 model.addAttribute("dejaPostule", dejaPostule);
+
+                boolean dejaSauvegarde = favoriRepository
+                        .existsByCandidatAndOffre(candidat, offre);
+                model.addAttribute("dejaSauvegarde", dejaSauvegarde);
             });
         }
 
