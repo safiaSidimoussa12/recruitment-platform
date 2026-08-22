@@ -15,6 +15,10 @@ VALUES (2, 'Mansouri', 'Karim', 1);
 --INSERT IGNORE INTO utilisateur (id, email, mot_de_passe, role, statut, date_creation)
 --VALUES (3, 'admin@test.com', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8RD6771k6v2uqXSymy', 'ADMIN', 'ACTIF', NOW());
 
+
+
+
+
 INSERT IGNORE INTO offre (id, titre, description, ville, domaine, salaire_min, salaire_max, type_contrat, statut, date_publication, entreprise_id, recruteur_id)
 VALUES (1, 'Développeur Spring Boot', 'Poste de développeur backend Java/Spring Boot', 'Alger', 'Informatique', 80000, 120000, 'CDI', 'PUBLIEE', NOW(), 1, 2);
 

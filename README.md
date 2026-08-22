@@ -160,28 +160,18 @@ MODIFY COLUMN statut ENUM(
 ALTER TABLE recruteur MODIFY COLUMN entreprise_id BIGINT NULL;
 ```
 
-### Create Admin Account
+### Admin Account
 
-Run this SQL after first launch to create the admin account:
+The admin account is created automatically on first launch using environment variables.
 
-```sql
--- Insert admin user (password: Admin@2026)
-INSERT INTO utilisateur (email, mot_de_passe, role, statut, date_creation)
-VALUES (
-    'admin@careerbridge.com',
-    '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
-    'ADMIN',
-    'ACTIF',
-    NOW()
-);
+Add these variables to your `.env` file:
+
+```env
+ADMIN_EMAIL=admin@careerbridge.com
+ADMIN_PASSWORD=yourSecurePassword
 ```
 
-> Default admin credentials:
->
-> - Email: `admin@careerbridge.com`
-> - Password: `password`
->
-> **Change the password immediately after first login.**
+> **Never commit your `.env` file to Git.**
 
 ## 📁 Project Structure
 
