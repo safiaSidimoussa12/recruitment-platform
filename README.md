@@ -162,15 +162,26 @@ ALTER TABLE recruteur MODIFY COLUMN entreprise_id BIGINT NULL;
 
 ### Create Admin Account
 
+Run this SQL after first launch to create the admin account:
+
 ```sql
--- 1. Register normally as a candidate at /register
--- 2. Then run this query to promote to admin:
-UPDATE utilisateur
-SET role = 'ADMIN'
-WHERE email = 'your_email@example.com';
+-- Insert admin user (password: Admin@2026)
+INSERT INTO utilisateur (email, mot_de_passe, role, statut, date_creation)
+VALUES (
+    'admin@careerbridge.com',
+    '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+    'ADMIN',
+    'ACTIF',
+    NOW()
+);
 ```
 
----
+> Default admin credentials:
+>
+> - Email: `admin@careerbridge.com`
+> - Password: `password`
+>
+> **Change the password immediately after first login.**
 
 ## 📁 Project Structure
 
