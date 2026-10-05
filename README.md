@@ -129,7 +129,6 @@ http://localhost:8080
 | Candidate | candidat@test.com  | password123 |
 | Recruiter | recruteur@test.com | password123 |
 
-> Admin account must be created manually — register as a candidate then update the role in MySQL.
 
 ---
 
